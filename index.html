@@ -1,0 +1,2408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>(casi) Desempleados - App Oficial</title>
+    <!-- Metadatos PWA y Pantalla Completa en iOS / Android / Tabletas -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="(casi) Desempleados">
+    <meta name="theme-color" content="#100E17">
+    <link id="pwa-apple-icon" rel="apple-touch-icon" href="">
+    <link id="pwa-manifest-link" rel="manifest" href="">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Tipografías oficiales de la marca: Montserrat y Caveat -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        handwriting: ['Caveat', 'cursive'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#5E2379',
+                            purpleDark: '#431658',
+                            teal: '#1B6C8A',
+                            tealLight: '#2489AE',
+                            yellow: '#F7D651',
+                            yellowHover: '#F5CB27',
+                            dark: '#100E17',
+                            card: '#1C1927'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #09080D;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .post-it {
+            background: linear-gradient(135deg, #F7D651 0%, #EBC32E 100%);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+            transform: rotate(-1.5deg);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .post-it:active {
+            transform: rotate(0deg) scale(0.97);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.22s ease-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #gameCanvas {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .safe-top {
+            padding-top: max(1rem, env(safe-area-inset-top));
+        }
+        .safe-bottom {
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex justify-center items-center md:p-4 lg:p-6">
+
+    <!-- Contenedor Principal Adaptable: Móvil (100%) y Tableta (max-w-[680px]) -->
+    <div id="app-shell" class="w-full md:max-w-[680px] h-[100dvh] md:h-[90dvh] md:max-h-[960px] bg-brand-dark md:rounded-[2.4rem] md:border-[6px] md:border-[#2A2638] shadow-2xl flex flex-col overflow-hidden relative">
+
+        <!-- ========================================== -->
+        <!-- CABECERA OFICIAL DE LA APP                 -->
+        <!-- ========================================== -->
+        <header class="safe-top pb-2.5 px-4 md:px-6 bg-gradient-to-b from-[#1A1626] to-brand-dark flex items-center justify-between shrink-0 z-20 relative">
+            <!-- Logotipo Horizontal Oficial en SVG -->
+            <div class="flex items-center">
+                <svg viewBox="0 0 380 132" class="h-12 md:h-14 w-auto drop-shadow-md select-none" aria-label="(casi) Desempleados">
+                    <defs>
+                        <filter id="headerPostitShadow" x="-15%" y="-15%" width="140%" height="145%">
+                            <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="#000000" flood-opacity="0.5"/>
+                        </filter>
+                    </defs>
+                    <rect x="6" y="66" width="154" height="58" fill="#5E2379"/>
+                    <rect x="160" y="66" width="214" height="58" fill="#1B6C8A"/>
+                    <text x="190" y="108" text-anchor="middle" fill="#FFFFFF" font-family="'Montserrat', sans-serif" font-weight="800" font-size="34.5" letter-spacing="0.8">DESEMPLEADOS</text>
+                    <g transform="translate(32, 12) rotate(-7)" filter="url(#headerPostitShadow)">
+                        <path d="M 0,0 L 74,0 L 92,16 L 92,62 L 0,62 Z" fill="#F7D651"/>
+                        <path d="M 0,0 L 74,0 L 78,10 L 0,10 Z" fill="#EAD043" opacity="0.55"/>
+                        <polygon points="74,0 92,16 74,16" fill="#DFB624"/>
+                        <text x="45" y="44" text-anchor="middle" fill="#111111" font-family="'Caveat', cursive" font-weight="700" font-size="37">(casi)</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Botón de Notificaciones Dinámico -->
+            <button id="notif-bell-btn" onclick="toggleNotificationsPanel()" class="relative p-2.5 rounded-full bg-brand-card hover:bg-white/10 text-brand-yellow transition active:scale-95" title="Notificaciones">
+                <i class="fas fa-bell text-base"></i>
+                <span id="notif-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-brand-yellow rounded-full border-2 border-brand-dark animate-pulse"></span>
+            </button>
+        </header>
+
+        <!-- ========================================== -->
+        <!-- BARRA DE NAVEGACIÓN SUPERIOR (3 PESTAÑAS)  -->
+        <!-- ========================================== -->
+        <nav class="shrink-0 bg-[#161320] border-y border-white/10 px-4 md:px-6 py-1.5 grid grid-cols-3 gap-2 z-20">
+            <button onclick="switchTab('inicio')" id="nav-inicio" class="nav-btn active flex items-center justify-center gap-1.5 py-2 rounded-xl bg-brand-yellow/15 text-brand-yellow transition">
+                <i class="fas fa-house text-xs"></i>
+                <span class="text-xs font-extrabold">Inicio</span>
+            </button>
+            <button onclick="switchTab('buzon')" id="nav-buzon" class="nav-btn flex items-center justify-center gap-1.5 py-2 rounded-xl text-gray-400 hover:text-white transition">
+                <i class="fas fa-envelope-open-text text-xs"></i>
+                <span class="text-xs font-bold">Buzón</span>
+            </button>
+            <button onclick="switchTab('jugar')" id="nav-jugar" class="nav-btn flex items-center justify-center gap-1.5 py-2 rounded-xl text-gray-400 hover:text-white transition">
+                <i class="fas fa-gamepad text-xs"></i>
+                <span class="text-xs font-bold">Jugar</span>
+            </button>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- PANEL DESPLEGABLE DE NOTIFICACIONES        -->
+        <!-- ========================================== -->
+        <div id="notif-panel" class="hidden absolute top-[72px] left-3 right-3 bg-[#1D1A2B] border border-white/15 rounded-2xl shadow-2xl z-40 overflow-hidden">
+            <div class="px-4 py-2.5 bg-brand-purple/40 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-bell text-brand-yellow text-xs"></i>
+                    <span class="text-xs font-extrabold text-white tracking-wide">Notificaciones</span>
+                </div>
+                <button onclick="closeNotificationsPanel()" class="text-gray-400 hover:text-white p-1 text-xs">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="notif-list" class="max-h-[260px] overflow-y-auto divide-y divide-white/10 no-scrollbar">
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ÁREA DE CONTENIDO DINÁMICO (SCROLLABLE)    -->
+        <!-- ========================================== -->
+        <main class="flex-1 overflow-y-auto no-scrollbar px-4 md:px-6 pt-4 pb-6">
+
+            <!-- ========================================== -->
+            <!-- PESTAÑA 1: INICIO / REDES Y CANALES        -->
+            <!-- ========================================== -->
+            <section id="tab-inicio" class="tab-content active space-y-5">
+                
+                <!-- Tarjeta Principal: Canales Oficiales -->
+                <div class="rounded-2xl bg-gradient-to-br from-brand-purple via-[#3B1B54] to-brand-teal p-4 md:p-5 shadow-lg border border-white/15 relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-brand-yellow text-gray-900 rounded-full">
+                            Podcast Oficial
+                        </span>
+                        <span class="text-[11px] font-bold text-white/90 flex items-center gap-1">
+                            <i class="far fa-clock text-brand-yellow"></i> Viernes 05:00
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3.5 mt-2">
+                        <!-- Logo comprimido oficial -->
+                        <div class="w-16 h-16 rounded-xl bg-black border border-white/15 flex items-center justify-center shrink-0 shadow-md p-1.5">
+                            <svg viewBox="0 0 120 110" class="w-full h-full">
+                                <rect x="10" y="64" width="50" height="26" fill="#5E2379"/>
+                                <rect x="60" y="64" width="50" height="26" fill="#1B6C8A"/>
+                                <g transform="translate(18, 16) rotate(-7)">
+                                    <path d="M 0,0 L 66,0 L 82,15 L 82,56 L 0,56 Z" fill="#F7D651"/>
+                                    <polygon points="66,0 82,15 66,15" fill="#DFB624"/>
+                                    <text x="40" y="40" text-anchor="middle" fill="#111111" font-family="'Caveat', cursive" font-weight="700" font-size="33">(casi)</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <h2 class="text-sm font-extrabold text-white leading-snug">
+                                Escucha todos nuestros episodios
+                            </h2>
+                            <p class="text-[11px] text-gray-200 mt-0.5 leading-tight">
+                                Nuevos episodios <strong class="text-brand-yellow font-extrabold">todos los viernes a las 05:00</strong> en tu plataforma favorita.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 mt-4">
+                        <a href="https://open.spotify.com/show/033LJFMZVKTVzYfKnDWQbr" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('Spotify')" class="py-2.5 px-3 rounded-xl bg-[#1DB954] hover:bg-[#1ed760] text-gray-950 font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                            <i class="fab fa-spotify text-base"></i>
+                            <span>Ir a Spotify</span>
+                        </a>
+                        <a href="https://www.youtube.com/@Casidesempleados" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('YouTube')" class="py-2.5 px-3 rounded-xl bg-[#FF0000] hover:bg-[#e60000] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md transition active:scale-95">
+                            <i class="fab fa-youtube text-base"></i>
+                            <span>YouTube</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Accesos Directos a Redes Oficiales -->
+                <div>
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-gray-300">Comunidad y Redes</h3>
+                        <span class="text-[11px] text-brand-tealLight font-bold">(casi) Desempleados</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <a href="https://open.spotify.com/show/033LJFMZVKTVzYfKnDWQbr" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('Spotify')" class="bg-brand-card hover:bg-[#252134] p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 transition active:scale-95 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#1DB954]/20 text-[#1DB954] flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                <i class="fab fa-spotify"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold text-white">Spotify</div>
+                                <div class="text-[11px] text-gray-400">Episodios completos</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.youtube.com/@Casidesempleados" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('YouTube')" class="bg-brand-card hover:bg-[#252134] p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 transition active:scale-95 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#FF0000]/20 text-[#FF0000] flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                <i class="fab fa-youtube"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold text-white">YouTube</div>
+                                <div class="text-[11px] text-gray-400">Canal oficial</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.tiktok.com/@casi.desempleados?_r=1&_t=ZS-9BV2J3aDIpi" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('TikTok')" class="bg-brand-card hover:bg-[#252134] p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 transition active:scale-95 group">
+                            <div class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                <i class="fab fa-tiktok"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold text-white">TikTok</div>
+                                <div class="text-[11px] text-gray-400">Clips y momentos</div>
+                            </div>
+                        </a>
+
+                        <a href="https://www.instagram.com/casi.desempleados?rpxt=MXVzYWtnZmgyaDE3OA==" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('Instagram')" class="bg-brand-card hover:bg-[#252134] p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 transition active:scale-95 group">
+                            <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center text-xl group-hover:scale-110 transition">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm font-extrabold text-white">Instagram</div>
+                                <div class="text-[11px] text-gray-400">@casi.desempleados</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Call to Action al Buzón Anónimo -->
+                <button onclick="switchTab('buzon')" class="w-full post-it p-4 rounded-2xl text-gray-900 flex items-center justify-between text-left cursor-pointer">
+                    <div class="pr-3">
+                        <div class="font-handwriting text-2xl font-bold leading-none mb-1">¿Tienes un chismesito?</div>
+                        <p class="text-xs font-bold text-gray-800 leading-snug">
+                            Mándanos tu historia anónima directo al buzón para leerla en el programa.
+                        </p>
+                    </div>
+                    <div class="w-11 h-11 rounded-full bg-gray-900 text-brand-yellow flex items-center justify-center shrink-0 shadow-md">
+                        <i class="fas fa-envelope-open-text text-lg"></i>
+                    </div>
+                </button>
+
+                <!-- Acceso rápido a la zona de Minijuegos -->
+                <div class="bg-brand-card rounded-2xl p-4 border border-white/10 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-brand-teal/25 text-[#5CE1E6] flex items-center justify-center text-xl">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-extrabold text-white">¿Sin nada que hacer?</h4>
+                            <p class="text-xs text-gray-400">3 minijuegos godines para romper tu récord</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('jugar')" class="px-3.5 py-2 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-xs font-extrabold text-white transition active:scale-95">
+                        Jugar
+                    </button>
+                </div>
+
+            </section>
+
+            <!-- ========================================== -->
+            <!-- PESTAÑA 2: BUZÓN ANÓNIMO (GOOGLE FORMS)    -->
+            <!-- ========================================== -->
+            <section id="tab-buzon" class="tab-content space-y-4">
+                <div class="bg-brand-card p-5 rounded-2xl border border-white/10 space-y-4">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-full bg-brand-yellow/20 text-brand-yellow text-[10px] font-extrabold uppercase tracking-wider">
+                                100% Confidencial
+                            </span>
+                            <h2 class="text-lg font-black text-white mt-1.5">Buzón de Chismes Anónimos</h2>
+                            <p class="text-xs text-gray-300 mt-0.5">
+                                Cuéntanos tu tragedia laboral, experiencia paranormal o confesión godín para leerla al aire.
+                            </p>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-brand-purple/40 text-brand-yellow flex items-center justify-center shrink-0">
+                            <i class="fas fa-user-secret text-lg"></i>
+                        </div>
+                    </div>
+
+                    <form id="buzon-form" onsubmit="submitAnonMessage(event)" class="space-y-3.5">
+                        <div>
+                            <label for="buzon-alias" class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-300 mb-1">
+                                Apodo o Pseudónimo (Opcional)
+                            </label>
+                            <input id="buzon-alias" type="text" maxlength="40" placeholder="Ej. El Becario Asustado" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-300 mb-1.5">
+                                Privacidad al leerlo
+                            </label>
+                            <div class="space-y-2 text-xs">
+                                <label class="flex items-center gap-2.5 bg-brand-dark/80 p-2.5 rounded-xl border border-white/10 cursor-pointer">
+                                    <input type="radio" name="buzon-privacy" value="Si, por favor oculten mi información." checked class="accent-[#F7D651]">
+                                    <span class="text-gray-200 font-semibold">Sí, por favor oculten mi información.</span>
+                                </label>
+                                <label class="flex items-center gap-2.5 bg-brand-dark/80 p-2.5 rounded-xl border border-white/10 cursor-pointer">
+                                    <input type="radio" name="buzon-privacy" value="No importa, pueden decir mi apodo." class="accent-[#F7D651]">
+                                    <span class="text-gray-200 font-semibold">No importa, pueden decir mi apodo.</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="buzon-story" class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-300 mb-1">
+                                Tu chismesito o historia *
+                            </label>
+                            <textarea id="buzon-story" rows="4" required placeholder="Escribe aquí todo el contexto sin miedo..." class="w-full bg-brand-dark border border-white/15 rounded-xl p-3.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow resize-none"></textarea>
+                        </div>
+
+                        <button id="buzon-submit-btn" type="submit" class="w-full py-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Enviar Chismesito Anónimo</span>
+                        </button>
+                    </form>
+
+                    <div id="buzon-success" class="hidden space-y-3 pt-1">
+                        <div class="post-it p-4 rounded-2xl text-gray-900">
+                            <div class="font-handwriting text-2xl font-bold leading-none mb-1">¡Recibido en cabina!</div>
+                            <p class="text-xs font-bold text-gray-800">
+                                Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.
+                            </p>
+                        </div>
+                        <button onclick="resetBuzon()" class="w-full py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-xs transition">
+                            Enviar otro chismesito
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================== -->
+            <!-- PESTAÑA 3: JUGAR (3 MINIJUEGOS GODINES)    -->
+            <!-- ========================================== -->
+            <section id="tab-jugar" class="tab-content h-full">
+                <div class="flex flex-col h-full">
+
+                    <!-- Selector Superior de Minijuegos -->
+                    <div class="grid grid-cols-3 gap-1.5 p-1 bg-brand-card rounded-2xl border border-white/10 mb-3 shrink-0">
+                        <button id="select-game-esquiva" onclick="switchMinigame('esquiva')" class="py-2 px-1.5 rounded-xl bg-brand-purple text-white font-extrabold text-[11px] flex items-center justify-center gap-1 shadow transition">
+                            <i class="fas fa-person-running text-brand-yellow"></i>
+                            <span>Esquiva</span>
+                        </button>
+                        <button id="select-game-checa" onclick="switchMinigame('checa')" class="py-2 px-1.5 rounded-xl text-gray-400 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 transition">
+                            <i class="fas fa-stopwatch text-[#5CE1E6]"></i>
+                            <span>Checador</span>
+                        </button>
+                        <button id="select-game-tetris" onclick="switchMinigame('tetris')" class="py-2 px-1.5 rounded-xl text-gray-400 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 transition">
+                            <i class="fas fa-cubes-stacked text-brand-yellow"></i>
+                            <span>Archivero</span>
+                        </button>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- MINIJUEGO A: ESQUIVA EL REPORTE            -->
+                    <!-- ========================================== -->
+                    <div id="minigame-esquiva" class="flex flex-col flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <h2 class="text-sm font-black text-white flex items-center gap-1.5">
+                                    <i class="fas fa-gamepad text-brand-yellow"></i> Esquiva el Reporte
+                                </h2>
+                                <p class="text-[10px] text-gray-400">
+                                    Nivel <span id="esquiva-level-display" class="text-brand-yellow font-extrabold">1</span> • +velocidad cada 100 pts
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Tiempo</div>
+                                    <div id="current-time-display" class="text-xs font-black text-[#5CE1E6]">00:00</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Récord</div>
+                                    <div id="high-score-display" class="text-xs font-black text-brand-yellow">0</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Puntos</div>
+                                    <div id="current-score-display" class="text-xs font-black text-white">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="game-container" class="relative w-full h-[360px] sm:h-[400px] md:h-[460px] bg-[#14121C] rounded-2xl border-2 border-brand-purple/60 overflow-hidden shadow-inner flex items-center justify-center">
+                            
+                            <canvas id="gameCanvas" class="w-full h-full block"></canvas>
+
+                            <div id="esquiva-level-banner" class="hidden pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-brand-yellow text-gray-950 font-black text-[11px] shadow-lg z-20 animate-bounce">
+                                ⚡ ¡NIVEL 2! MÁS RÁPIDO
+                            </div>
+
+                            <div id="game-start-overlay" class="absolute inset-0 bg-[#0D0B14]/95 backdrop-blur-md flex flex-col items-center justify-center p-5 text-center z-10">
+                                <div class="post-it px-3.5 py-1 text-gray-900 font-handwriting font-bold text-2xl mb-2">
+                                    Modo: Sin nada que hacer
+                                </div>
+                                <h3 class="text-lg font-black text-white">Esquiva el Reporte</h3>
+                                <p class="text-xs text-gray-300 mt-1 max-w-[265px]">
+                                    Cada <strong class="text-brand-yellow">100 puntos</strong> aumenta la velocidad de la oficina:
+                                </p>
+
+                                <div class="grid grid-cols-2 gap-2 my-3 text-left text-[11px] w-full max-w-[280px]">
+                                    <div class="bg-[#0F291E] p-2 rounded-xl flex items-center gap-2 border border-emerald-400/50">
+                                        <div class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-sm shrink-0">☕</div>
+                                        <div><strong class="text-emerald-300 font-extrabold">+10 pts</strong><br><span class="text-gray-300 text-[10px]">Café vital</span></div>
+                                    </div>
+                                    <div class="bg-[#2B240C] p-2 rounded-xl flex items-center gap-2 border border-amber-400/60">
+                                        <div class="w-7 h-7 rounded-lg bg-amber-400/20 border border-amber-400 flex items-center justify-center text-sm shrink-0">🏅</div>
+                                        <div><strong class="text-brand-yellow font-extrabold">+25 pts</strong><br><span class="text-gray-300 text-[10px]">Bono Extra</span></div>
+                                    </div>
+                                    <div class="bg-[#311016] p-2 rounded-xl flex items-center gap-2 border border-rose-500/70">
+                                        <div class="w-7 h-7 rounded-lg bg-rose-500/25 border border-rose-500 flex items-center justify-center text-xs font-black text-rose-200 shrink-0">R!</div>
+                                        <div><strong class="text-rose-400 font-extrabold">¡Evita!</strong><br><span class="text-gray-300 text-[10px]">Reporte RH</span></div>
+                                    </div>
+                                    <div class="bg-[#321A0E] p-2 rounded-xl flex items-center gap-2 border border-orange-500/70">
+                                        <div class="w-7 h-7 rounded-lg bg-orange-500/25 border border-orange-500 flex items-center justify-center text-sm shrink-0">⏰</div>
+                                        <div><strong class="text-orange-400 font-extrabold">¡Evita!</strong><br><span class="text-gray-300 text-[10px]">Junta 5:59 PM</span></div>
+                                    </div>
+                                </div>
+
+                                <button onclick="startGame()" class="px-6 py-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-sm shadow-lg transition transform active:scale-95 flex items-center gap-2">
+                                    <i class="fas fa-play"></i> Iniciar Turno
+                                </button>
+                            </div>
+
+                            <div id="game-over-overlay" class="hidden absolute inset-0 bg-[#0B0911]/95 backdrop-blur-md flex-col items-center justify-between p-4 text-center z-20 overflow-y-auto no-scrollbar">
+                                <div class="w-full">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[9px] font-extrabold uppercase tracking-wider">
+                                        ¡Te cayó Recursos Humanos!
+                                    </span>
+                                    <h3 class="text-lg font-black text-white mt-1">Fin del Turno</h3>
+                                    <p id="game-over-reason" class="text-[11px] text-gray-300">Te cayó un reporte administrativo.</p>
+
+                                    <div class="mt-2 bg-brand-card px-4 py-2 rounded-xl border border-white/10 flex items-center justify-around">
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Puntos</div>
+                                            <div id="final-score" class="text-xl font-black text-brand-yellow">0</div>
+                                        </div>
+                                        <div class="h-7 w-px bg-white/10"></div>
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Tiempo</div>
+                                            <div id="final-duration" class="text-xl font-black text-[#5CE1E6]">00:00</div>
+                                        </div>
+                                    </div>
+                                    <div id="new-record-badge" class="hidden text-[10px] font-extrabold text-emerald-400 mt-1">
+                                        🎉 ¡Nuevo Récord Personal!
+                                    </div>
+                                </div>
+
+                                <div class="w-full my-2 bg-black/50 rounded-xl border border-white/10 overflow-hidden">
+                                    <div class="px-3 py-1.5 bg-brand-purple/40 border-b border-white/10 flex items-center justify-between">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-white">
+                                            <i class="fas fa-trophy text-brand-yellow mr-1"></i> Tabla de Puntajes
+                                        </span>
+                                        <span class="text-[9px] text-gray-300">Top 5 turnos</span>
+                                    </div>
+                                    <div class="max-h-[115px] overflow-y-auto no-scrollbar">
+                                        <table class="w-full text-left border-collapse text-[10px]">
+                                            <thead>
+                                                <tr class="text-gray-400 border-b border-white/10 bg-white/5">
+                                                    <th class="py-1.5 px-2.5 font-extrabold">#</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Puntos</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Tiempo</th>
+                                                    <th class="py-1.5 px-2.5 font-extrabold text-right">Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="scoreboard-tbody" class="divide-y divide-white/5 text-gray-200">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="startGame()" class="flex-1 py-2.5 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-xs shadow-md transition active:scale-95">
+                                        <i class="fas fa-rotate-right mr-1"></i> Reintentar
+                                    </button>
+                                    <button onclick="shareGameScore('esquiva')" class="px-3.5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-xs shadow-md transition active:scale-95" title="Compartir puntuación">
+                                        <i class="fas fa-share-nodes"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mt-2.5">
+                            <button id="btn-left" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-purple border border-white/10 text-white font-extrabold text-xs flex items-center justify-center gap-2 select-none">
+                                <i class="fas fa-arrow-left"></i> Izquierda
+                            </button>
+                            <button id="btn-right" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-purple border border-white/10 text-white font-extrabold text-xs flex items-center justify-center gap-2 select-none">
+                                Derecha <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- MINIJUEGO B: CHECA TARJETA (PRECISIÓN)     -->
+                    <!-- ========================================== -->
+                    <div id="minigame-checa" class="hidden flex-col flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <h2 class="text-sm font-black text-white flex items-center gap-1.5">
+                                    <i class="fas fa-stopwatch text-[#5CE1E6]"></i> Checa Tarjeta
+                                </h2>
+                                <p class="text-[10px] text-gray-400">
+                                    Día <span id="checa-day-display" class="text-[#5CE1E6] font-extrabold">1</span> • Detén el reloj en <span class="text-emerald-400 font-bold">09:00</span>
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Vidas</div>
+                                    <div id="checa-lives-display" class="text-xs font-black text-rose-400">❤️❤️❤️</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Récord</div>
+                                    <div id="checa-highscore-display" class="text-xs font-black text-brand-yellow">0</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Puntos</div>
+                                    <div id="checa-score-display" class="text-xs font-black text-white">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full h-[360px] sm:h-[400px] md:h-[460px] bg-[#14121C] rounded-2xl border-2 border-brand-teal/60 p-4 md:p-6 flex flex-col justify-between overflow-hidden shadow-inner">
+                            
+                            <div class="bg-black/70 border border-white/15 rounded-2xl p-3 text-center">
+                                <div class="flex items-center justify-between text-[10px] font-extrabold text-gray-400 uppercase mb-1">
+                                    <span>Checador Biométrico RH</span>
+                                    <span id="checa-speed-badge" class="px-2 py-0.5 rounded bg-brand-teal/30 text-[#5CE1E6]">Vel. 1.0x</span>
+                                </div>
+                                <div id="checa-clock-readout" class="text-3xl font-black tracking-wider text-white font-mono">
+                                    08:55 AM
+                                </div>
+                                <div id="checa-feedback-text" class="text-xs font-extrabold text-brand-yellow mt-1 h-4">
+                                    ¡Presiona CHECAR cuando pase por la zona verde!
+                                </div>
+                            </div>
+
+                            <div class="my-auto space-y-2">
+                                <div class="flex justify-between text-[10px] font-extrabold text-gray-400 px-1">
+                                    <span>08:45 (Muy temprano)</span>
+                                    <span class="text-emerald-400">09:00 EN PUNTO</span>
+                                    <span class="text-rose-400">09:15 (Retardo)</span>
+                                </div>
+
+                                <div id="checa-track" class="relative w-full h-14 bg-[#0B0A10] rounded-2xl border-2 border-white/15 overflow-hidden shadow-inner">
+                                    <div id="checa-green-zone" class="absolute top-0 bottom-0 bg-emerald-500/30 border-x-2 border-emerald-400 transition-all duration-200" style="left: 38%; width: 24%;"></div>
+                                    <div id="checa-perfect-zone" class="absolute top-0 bottom-0 bg-brand-yellow/45 border-x border-brand-yellow transition-all duration-200" style="left: 47%; width: 6%;"></div>
+                                    <div id="checa-needle" class="absolute top-1 bottom-1 w-2 bg-white rounded-full shadow-[0_0_12px_#FFFFFF]" style="left: 0%;"></div>
+                                </div>
+
+                                <div class="flex items-center justify-center gap-4 text-[10px] text-gray-300 pt-1">
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-brand-yellow inline-block"></span> En punto (+50 pts)</span>
+                                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span> A tiempo (+25 pts)</span>
+                                </div>
+                            </div>
+
+                            <button id="checa-action-btn" onclick="handleChecaAction()" class="w-full py-4 rounded-2xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-base shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
+                                <i class="fas fa-fingerprint text-xl"></i>
+                                <span id="checa-btn-label">INICIAR SEMANA</span>
+                            </button>
+
+                            <div id="checa-gameover-overlay" class="hidden absolute inset-0 bg-[#0B0911]/95 backdrop-blur-md flex-col items-center justify-between p-4 text-center z-20 overflow-y-auto no-scrollbar">
+                                <div class="w-full">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[9px] font-extrabold uppercase tracking-wider">
+                                        3 Retardos Acumulados
+                                    </span>
+                                    <h3 class="text-lg font-black text-white mt-1">Acta Administrativa</h3>
+                                    <p class="text-[11px] text-gray-300">Llegaste tarde demasiadas veces esta semana.</p>
+
+                                    <div class="mt-2 bg-brand-card px-4 py-2 rounded-xl border border-white/10 flex items-center justify-around">
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Puntos</div>
+                                            <div id="checa-final-score" class="text-xl font-black text-brand-yellow">0</div>
+                                        </div>
+                                        <div class="h-7 w-px bg-white/10"></div>
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Días / Tiempo</div>
+                                            <div id="checa-final-duration" class="text-xl font-black text-[#5CE1E6]">00:00</div>
+                                        </div>
+                                    </div>
+                                    <div id="checa-new-record-badge" class="hidden text-[10px] font-extrabold text-emerald-400 mt-1">
+                                        🎉 ¡Nuevo Récord en Checa Tarjeta!
+                                    </div>
+                                </div>
+
+                                <div class="w-full my-2 bg-black/50 rounded-xl border border-white/10 overflow-hidden">
+                                    <div class="px-3 py-1.5 bg-brand-teal/40 border-b border-white/10 flex items-center justify-between">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-white">
+                                            <i class="fas fa-trophy text-brand-yellow mr-1"></i> Tabla Checa Tarjeta
+                                        </span>
+                                        <span class="text-[9px] text-gray-300">Top 5 semanas</span>
+                                    </div>
+                                    <div class="max-h-[115px] overflow-y-auto no-scrollbar">
+                                        <table class="w-full text-left border-collapse text-[10px]">
+                                            <thead>
+                                                <tr class="text-gray-400 border-b border-white/10 bg-white/5">
+                                                    <th class="py-1.5 px-2.5 font-extrabold">#</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Puntos</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Tiempo</th>
+                                                    <th class="py-1.5 px-2.5 font-extrabold text-right">Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="checa-scoreboard-tbody" class="divide-y divide-white/5 text-gray-200">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="startChecaGame()" class="flex-1 py-2.5 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-xs shadow-md transition active:scale-95">
+                                        <i class="fas fa-rotate-right mr-1"></i> Nueva Semana
+                                    </button>
+                                    <button onclick="shareGameScore('checa')" class="px-3.5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-xs shadow-md transition active:scale-95" title="Compartir puntuación">
+                                        <i class="fas fa-share-nodes"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- MINIJUEGO C: ARCHIVERO TETRIS              -->
+                    <!-- ========================================== -->
+                    <div id="minigame-tetris" class="hidden flex-col flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <h2 class="text-sm font-black text-white flex items-center gap-1.5">
+                                    <i class="fas fa-cubes-stacked text-brand-yellow"></i> Archivero Tetris
+                                </h2>
+                                <p class="text-[10px] text-gray-400">
+                                    Nivel <span id="tetris-level-display" class="text-brand-yellow font-extrabold">1</span> • +velocidad cada 100 pts
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Líneas</div>
+                                    <div id="tetris-lines-display" class="text-xs font-black text-[#5CE1E6]">0</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Récord</div>
+                                    <div id="tetris-highscore-display" class="text-xs font-black text-brand-yellow">0</div>
+                                </div>
+                                <div class="bg-brand-card px-2 py-1 rounded-xl border border-white/10 text-right">
+                                    <div class="text-[8px] uppercase text-gray-400 font-extrabold">Puntos</div>
+                                    <div id="tetris-score-display" class="text-xs font-black text-white">0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="relative w-full h-[360px] sm:h-[400px] md:h-[460px] bg-[#14121C] rounded-2xl border-2 border-brand-yellow/50 p-3 md:p-5 flex items-center justify-center gap-3 md:gap-6 overflow-hidden shadow-inner">
+                            
+                            <canvas id="tetrisCanvas" width="190" height="342" class="bg-[#0B0911] rounded-xl border border-white/15 shadow-lg"></canvas>
+
+                            <div class="flex flex-col justify-between h-[342px] w-[108px] shrink-0">
+                                <div class="bg-brand-card border border-white/10 rounded-xl p-2 text-center">
+                                    <div class="text-[9px] font-extrabold uppercase text-gray-400 mb-1">Siguiente</div>
+                                    <canvas id="tetrisNextCanvas" width="76" height="76" class="mx-auto bg-[#0B0911] rounded-lg border border-white/10"></canvas>
+                                </div>
+
+                                <div class="bg-brand-card border border-white/10 rounded-xl p-2 text-center">
+                                    <div class="text-[9px] font-extrabold uppercase text-gray-400">Tiempo</div>
+                                    <div id="tetris-time-display" class="text-sm font-black text-[#5CE1E6] mt-0.5">00:00</div>
+                                </div>
+
+                                <div class="bg-brand-purple/25 border border-brand-purple/50 rounded-xl p-2 text-[9px] text-gray-300 leading-tight">
+                                    <strong class="text-brand-yellow block mb-0.5">Acomoda pendientes:</strong>
+                                    Completa filas horizontales para archivarlas y sumar puntos.
+                                </div>
+                            </div>
+
+                            <div id="tetris-start-overlay" class="absolute inset-0 bg-[#0D0B14]/95 backdrop-blur-md flex flex-col items-center justify-center p-5 text-center z-10">
+                                <div class="post-it px-3.5 py-1 text-gray-900 font-handwriting font-bold text-2xl mb-2">
+                                    Modo: Ordenando el archivo
+                                </div>
+                                <h3 class="text-lg font-black text-white">Archivero Tetris</h3>
+                                <p class="text-xs text-gray-300 mt-1 max-w-[260px]">
+                                    Acomoda los bloques de carpetas y post-its. Cada <strong class="text-brand-yellow">100 puntos</strong> caen más rápido.
+                                </p>
+                                <button onclick="startTetrisGame()" class="mt-4 px-6 py-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-sm shadow-lg transition transform active:scale-95 flex items-center gap-2">
+                                    <i class="fas fa-play"></i> Empezar a Archivar
+                                </button>
+                            </div>
+
+                            <div id="tetris-gameover-overlay" class="hidden absolute inset-0 bg-[#0B0911]/95 backdrop-blur-md flex-col items-center justify-between p-4 text-center z-20 overflow-y-auto no-scrollbar">
+                                <div class="w-full">
+                                    <span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[9px] font-extrabold uppercase tracking-wider">
+                                        ¡Se saturó el escritorio!
+                                    </span>
+                                    <h3 class="text-lg font-black text-white mt-1">Archivero Lleno</h3>
+                                    <p class="text-[11px] text-gray-300">Los pendientes llegaron hasta el techo.</p>
+
+                                    <div class="mt-2 bg-brand-card px-4 py-2 rounded-xl border border-white/10 flex items-center justify-around">
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Puntos</div>
+                                            <div id="tetris-final-score" class="text-xl font-black text-brand-yellow">0</div>
+                                        </div>
+                                        <div class="h-7 w-px bg-white/10"></div>
+                                        <div>
+                                            <div class="text-[9px] text-gray-400 uppercase font-extrabold">Tiempo</div>
+                                            <div id="tetris-final-duration" class="text-xl font-black text-[#5CE1E6]">00:00</div>
+                                        </div>
+                                    </div>
+                                    <div id="tetris-new-record-badge" class="hidden text-[10px] font-extrabold text-emerald-400 mt-1">
+                                        🎉 ¡Nuevo Récord en Archivero Tetris!
+                                    </div>
+                                </div>
+
+                                <div class="w-full my-2 bg-black/50 rounded-xl border border-white/10 overflow-hidden">
+                                    <div class="px-3 py-1.5 bg-brand-purple/40 border-b border-white/10 flex items-center justify-between">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-white">
+                                            <i class="fas fa-trophy text-brand-yellow mr-1"></i> Tabla Archivero Tetris
+                                        </span>
+                                        <span class="text-[9px] text-gray-300">Top 5 partidas</span>
+                                    </div>
+                                    <div class="max-h-[115px] overflow-y-auto no-scrollbar">
+                                        <table class="w-full text-left border-collapse text-[10px]">
+                                            <thead>
+                                                <tr class="text-gray-400 border-b border-white/10 bg-white/5">
+                                                    <th class="py-1.5 px-2.5 font-extrabold">#</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Puntos</th>
+                                                    <th class="py-1.5 px-2 font-extrabold">Tiempo</th>
+                                                    <th class="py-1.5 px-2.5 font-extrabold text-right">Fecha</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tetris-scoreboard-tbody" class="divide-y divide-white/5 text-gray-200">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="startTetrisGame()" class="flex-1 py-2.5 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-xs shadow-md transition active:scale-95">
+                                        <i class="fas fa-rotate-right mr-1"></i> Reintentar
+                                    </button>
+                                    <button onclick="shareGameScore('tetris')" class="px-3.5 py-2.5 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-xs shadow-md transition active:scale-95" title="Compartir puntuación">
+                                        <i class="fas fa-share-nodes"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 mt-2.5">
+                            <button onclick="tetrisMove(-1)" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-purple border border-white/10 text-white font-extrabold text-xs flex items-center justify-center select-none">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <button onclick="tetrisRotate()" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-teal border border-white/10 text-brand-yellow font-extrabold text-xs flex items-center justify-center gap-1 select-none">
+                                <i class="fas fa-rotate-right"></i> Girar
+                            </button>
+                            <button onclick="tetrisHardDrop()" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-purple border border-white/10 text-[#5CE1E6] font-extrabold text-xs flex items-center justify-center gap-1 select-none">
+                                <i class="fas fa-angles-down"></i> Bajar
+                            </button>
+                            <button onclick="tetrisMove(1)" class="py-2.5 rounded-xl bg-brand-card active:bg-brand-purple border border-white/10 text-white font-extrabold text-xs flex items-center justify-center select-none">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ========================================== -->
+        <!-- ESPACIO PARA BANNER DISCRETO (MONETIZACIÓN)-->
+        <!-- ========================================== -->
+        <a id="ad-banner-slot" href="https://asiafilm.org/4/c84465d36c1cfc37571db21c4e00cd82" target="_blank" rel="noopener noreferrer sponsored" class="safe-bottom shrink-0 bg-[#15131E] border-t border-white/10 px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-[#1C1927] transition group">
+            <div class="flex items-center gap-2.5 overflow-hidden">
+                <span class="px-1.5 py-0.5 text-[9px] font-extrabold uppercase bg-brand-yellow/20 text-brand-yellow border border-brand-yellow/30 rounded shrink-0">
+                    Promo
+                </span>
+                <p class="text-[11px] text-gray-200 truncate font-semibold group-hover:text-white transition">
+                    Descubre beneficios y ofertas para godines • <span class="text-brand-yellow underline">Ver más</span>
+                </p>
+            </div>
+            <i class="fas fa-arrow-up-right-from-square text-gray-400 group-hover:text-brand-yellow text-xs shrink-0 ml-2 transition"></i>
+        </a>
+
+        <!-- ========================================== -->
+        <!-- MODAL DE TARJETA COMPARTIBLE (IMAGEN PNG)  -->
+        <!-- ========================================== -->
+        <div id="share-score-modal" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+            <div class="bg-brand-card border border-white/15 rounded-2xl p-4 w-full max-w-[360px] space-y-3 shadow-2xl max-h-[90%] overflow-y-auto no-scrollbar">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-black text-white flex items-center gap-1.5">
+                        <i class="fas fa-image text-brand-yellow"></i> Comparte tu Récord
+                    </h3>
+                    <button onclick="closeShareModal()" class="text-gray-400 hover:text-white p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div>
+                    <label for="share-player-name" class="block text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-1">
+                        Tu nombre o apodo en la tarjeta
+                    </label>
+                    <input id="share-player-name" type="text" maxlength="24" placeholder="Ej. El Godín Sobreviviente" oninput="updateShareCardName(this.value)" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3 py-2 text-xs text-white font-bold placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
+                </div>
+
+                <div class="bg-black/60 p-2 rounded-xl border border-white/10 flex justify-center">
+                    <canvas id="shareCardCanvas" width="720" height="900" class="w-full max-w-[235px] h-auto rounded-lg shadow-lg"></canvas>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="triggerNativeImageShare()" class="py-2.5 px-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+                        <i class="fas fa-share-nodes"></i> Compartir
+                    </button>
+                    <button onclick="downloadShareCardImage()" class="py-2.5 px-3 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-xs shadow-md transition active:scale-95 flex items-center justify-center gap-1.5">
+                        <i class="fas fa-download"></i> Descargar PNG
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MODAL INFORMATIVO (BANNER PUBLICITARIO)    -->
+        <!-- ========================================== -->
+        <div id="ad-modal" class="hidden absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-5">
+            <div class="bg-brand-card border border-white/15 rounded-2xl p-5 w-full max-w-[340px] space-y-3 shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded bg-brand-teal/30 text-[#5CE1E6] text-[10px] font-extrabold uppercase">Monetización Discreta</span>
+                    <button onclick="closeAdModal()" class="text-gray-400 hover:text-white p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <h3 class="text-base font-black text-white">Banner Inferior No Invasivo</h3>
+                <p class="text-xs text-gray-300 leading-relaxed">
+                    Esta franja inferior está diseñada para integrar <strong>Google AdSense</strong> (en versión Web/PWA) o <strong>Google AdMob</strong> (si la empaquetas para Android/iOS) sin interrumpir la lectura ni el minijuego.
+                </p>
+                <button onclick="closeAdModal()" class="w-full py-2.5 rounded-xl bg-brand-purple hover:bg-brand-purpleDark text-white font-extrabold text-xs">
+                    Entendido
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast de Mensajes -->
+        <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white border border-brand-yellow/60 px-4 py-2 rounded-full text-xs font-extrabold shadow-xl z-50 whitespace-nowrap">
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. NAVEGACIÓN ENTRE PESTAÑAS Y NOTIFICACIONES
+        // ==========================================
+        let appNotifications = [];
+        let lastFridayEpisodeAlertDate = localStorage.getItem('casi_desempleados_last_friday_alert') || '';
+
+        function initNotifications() {
+            const now = new Date();
+            const day = now.getDay();
+            const hour = now.getHours();
+            const todayKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+
+            let episodeNotif = {
+                title: '📅 Próximo episodio: Viernes 05:00',
+                body: 'Escúchanos todos los viernes a las 05:00 en Spotify y YouTube.',
+                icon: 'fa-calendar-check',
+                color: 'bg-brand-purple text-brand-yellow',
+                time: 'Horario oficial'
+            };
+
+            if (day === 5 && hour >= 5) {
+                episodeNotif = {
+                    title: '🔥 ¡Ya salió el nuevo episodio de hoy!',
+                    body: 'Disponible desde las 05:00 en Spotify y YouTube. ¡Corre a escucharlo!',
+                    icon: 'fa-podcast',
+                    color: 'bg-[#1DB954] text-gray-950',
+                    time: 'Viernes 05:00'
+                };
+                if (lastFridayEpisodeAlertDate !== todayKey) {
+                    lastFridayEpisodeAlertDate = todayKey;
+                    localStorage.setItem('casi_desempleados_last_friday_alert', todayKey);
+                    const badge = document.getElementById('notif-badge');
+                    if (badge) badge.classList.remove('hidden');
+                }
+            } else if (day === 4) {
+                episodeNotif = {
+                    title: '⏰ ¡Mañana hay episodio nuevo!',
+                    body: 'Prepárate para este viernes a las 05:00 en Spotify y YouTube.',
+                    icon: 'fa-clock',
+                    color: 'bg-brand-yellow text-gray-900',
+                    time: 'Mañana 05:00'
+                };
+            }
+
+            appNotifications = [
+                episodeNotif,
+                {
+                    title: '🏃 Récord Esquiva el Reporte',
+                    body: `Tu mejor marca es de ${highScore} pts. ¡Evita a Recursos Humanos!`,
+                    icon: 'fa-person-running',
+                    color: 'bg-brand-purple text-brand-yellow',
+                    time: 'Minijuego 1'
+                },
+                {
+                    title: '⏱️ Récord Checa Tarjeta',
+                    body: `Tu mejor marca es de ${checaHighScore} pts. ¡Llega puntual a las 09:00!`,
+                    icon: 'fa-stopwatch',
+                    color: 'bg-brand-teal text-white',
+                    time: 'Minijuego 2'
+                },
+                {
+                    title: '📦 Récord Archivero Tetris',
+                    body: `Tu mejor marca es de ${tetrisHighScore} pts. ¡Que no se llene el escritorio!`,
+                    icon: 'fa-cubes-stacked',
+                    color: 'bg-brand-yellow text-gray-900',
+                    time: 'Minijuego 3'
+                }
+            ];
+            renderNotifications();
+        }
+
+        setInterval(() => {
+            const now = new Date();
+            const todayKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            if (now.getDay() === 5 && now.getHours() >= 5 && lastFridayEpisodeAlertDate !== todayKey) {
+                lastFridayEpisodeAlertDate = todayKey;
+                localStorage.setItem('casi_desempleados_last_friday_alert', todayKey);
+                pushNotification(
+                    '🔥 ¡Ya salió el nuevo episodio de hoy!',
+                    'Son las 05:00 del viernes: ya puedes escuchar el nuevo capítulo en Spotify y YouTube.',
+                    'fa-podcast',
+                    'bg-[#1DB954] text-gray-950'
+                );
+                showToast('🎙️ ¡Nuevo episodio disponible en Spotify y YouTube!');
+            }
+        }, 60000);
+
+        function pushNotification(title, body, icon = 'fa-bell', color = 'bg-brand-yellow text-gray-900') {
+            appNotifications.unshift({
+                title,
+                body,
+                icon,
+                color,
+                time: 'Ahora'
+            });
+            const badge = document.getElementById('notif-badge');
+            if (badge) badge.classList.remove('hidden');
+            renderNotifications();
+        }
+
+        function renderNotifications() {
+            const listEl = document.getElementById('notif-list');
+            if (!listEl) return;
+
+            listEl.innerHTML = appNotifications.map(item => `
+                <div class="p-3.5 hover:bg-white/5 transition flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl ${item.color} flex items-center justify-center text-xs shrink-0 mt-0.5 shadow">
+                        <i class="fas ${item.icon}"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                            <h4 class="text-xs font-extrabold text-white leading-snug">${item.title}</h4>
+                            <span class="text-[9px] text-gray-400 shrink-0">${item.time}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-300 mt-0.5 leading-snug">${item.body}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleNotificationsPanel() {
+            const panel = document.getElementById('notif-panel');
+            const badge = document.getElementById('notif-badge');
+            if (!panel) return;
+
+            const isHidden = panel.classList.contains('hidden');
+            if (isHidden) {
+                panel.classList.remove('hidden');
+                if (badge) badge.classList.add('hidden');
+            } else {
+                panel.classList.add('hidden');
+            }
+        }
+
+        function closeNotificationsPanel() {
+            const panel = document.getElementById('notif-panel');
+            if (panel) panel.classList.add('hidden');
+        }
+
+        function switchTab(tabId) {
+            closeNotificationsPanel();
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.remove('active'));
+            const targetSec = document.getElementById('tab-' + tabId);
+            if (targetSec) targetSec.classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-yellow', 'bg-brand-yellow/15');
+                btn.classList.add('text-gray-400');
+                const span = btn.querySelector('span');
+                if (span) span.classList.replace('font-extrabold', 'font-bold');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-400');
+                activeBtn.classList.add('text-brand-yellow', 'bg-brand-yellow/15');
+                const span = activeBtn.querySelector('span');
+                if (span) span.classList.replace('font-bold', 'font-extrabold');
+            }
+
+            if (tabId === 'jugar') {
+                setTimeout(resizeGameCanvas, 50);
+            } else {
+                if (gameRunning) stopGame();
+                if (checaRunning) stopChecaLoop();
+                if (tetrisRunning) stopTetrisLoop();
+            }
+        }
+
+        function switchMinigame(gameKey) {
+            const btnEsquiva = document.getElementById('select-game-esquiva');
+            const btnCheca = document.getElementById('select-game-checa');
+            const btnTetris = document.getElementById('select-game-tetris');
+            const viewEsquiva = document.getElementById('minigame-esquiva');
+            const viewCheca = document.getElementById('minigame-checa');
+            const viewTetris = document.getElementById('minigame-tetris');
+
+            if (gameRunning) stopGame();
+            if (checaRunning) stopChecaLoop();
+            if (tetrisRunning) stopTetrisLoop();
+
+            [viewEsquiva, viewCheca, viewTetris].forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('flex');
+            });
+
+            const inactiveClass = 'py-2 px-1.5 rounded-xl text-gray-400 hover:text-white font-bold text-[11px] flex items-center justify-center gap-1 transition';
+            btnEsquiva.className = inactiveClass;
+            btnCheca.className = inactiveClass;
+            btnTetris.className = inactiveClass;
+
+            if (gameKey === 'esquiva') {
+                viewEsquiva.classList.remove('hidden');
+                viewEsquiva.classList.add('flex');
+                btnEsquiva.className = 'py-2 px-1.5 rounded-xl bg-brand-purple text-white font-extrabold text-[11px] flex items-center justify-center gap-1 shadow transition';
+                setTimeout(resizeGameCanvas, 40);
+            } else if (gameKey === 'checa') {
+                viewCheca.classList.remove('hidden');
+                viewCheca.classList.add('flex');
+                btnCheca.className = 'py-2 px-1.5 rounded-xl bg-brand-teal text-white font-extrabold text-[11px] flex items-center justify-center gap-1 shadow transition';
+            } else {
+                viewTetris.classList.remove('hidden');
+                viewTetris.classList.add('flex');
+                btnTetris.className = 'py-2 px-1.5 rounded-xl bg-brand-yellow text-gray-900 font-extrabold text-[11px] flex items-center justify-center gap-1 shadow transition';
+                drawTetrisBoard();
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2200);
+        }
+
+        function handleExternalLink(platformName) {
+            showToast(`Abriendo ${platformName}...`);
+        }
+
+        // ==========================================
+        // 2. BUZÓN ANÓNIMO (ENVÍO A GOOGLE FORMS)
+        // ==========================================
+        const GOOGLE_FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdJfJ6zFq1rqkDVODo2Se8uhXiMT2bGeLcEkhU7Xt9pDcX-OQ/formResponse';
+
+        async function submitAnonMessage(e) {
+            e.preventDefault();
+            const alias = document.getElementById('buzon-alias').value.trim();
+            const story = document.getElementById('buzon-story').value.trim();
+            const privacyInput = document.querySelector('input[name="buzon-privacy"]:checked');
+            const privacyChoice = privacyInput ? privacyInput.value : 'Si, por favor oculten mi información.';
+
+            if (!story) return;
+
+            const submitBtn = document.getElementById('buzon-submit-btn');
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Enviando al buzón...</span>';
+
+            const formData = new URLSearchParams();
+            formData.append('entry.370750559', alias || 'Anónimo');
+            formData.append('entry.116396303', privacyChoice);
+            formData.append('entry.1234219413', story);
+
+            try {
+                await fetch(GOOGLE_FORM_ACTION_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString()
+                });
+
+                document.getElementById('buzon-form').classList.add('hidden');
+                document.getElementById('buzon-success').classList.remove('hidden');
+                showToast('📨 Chismesito enviado al buzón oficial');
+                pushNotification(
+                    '📨 Chismesito enviado al buzón',
+                    'Tu historia quedó registrada de forma segura para el programa.',
+                    'fa-envelope-open-text',
+                    'bg-brand-yellow text-gray-900'
+                );
+            } catch (error) {
+                showToast('Hubo un detalle de red, intenta de nuevo');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        function resetBuzon() {
+            document.getElementById('buzon-story').value = '';
+            document.getElementById('buzon-success').classList.add('hidden');
+            document.getElementById('buzon-form').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 3. MINIJUEGO: "ESQUIVA EL REPORTE"
+        // ==========================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('game-container');
+
+        let gameRunning = false;
+        let animationFrameId = null;
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('casi_desempleados_highscore') || '0', 10);
+        let scoreHistory = JSON.parse(localStorage.getItem('casi_desempleados_scores') || '[]');
+        let gameStartTime = 0;
+        let elapsedSeconds = 0;
+
+        document.getElementById('high-score-display').textContent = highScore;
+
+        const player = {
+            x: 0,
+            y: 0,
+            width: 72,
+            height: 46,
+            speed: 7,
+            movingLeft: false,
+            movingRight: false
+        };
+
+        let fallingItems = [];
+        let spawnTimer = 0;
+        let difficultyMultiplier = 1;
+        let currentEsquivaLevel = 1;
+
+        function formatDuration(totalSec) {
+            const mins = Math.floor(totalSec / 60).toString().padStart(2, '0');
+            const secs = (totalSec % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+
+        function formatShortDate(dateObj) {
+            const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const d = dateObj.getDate().toString().padStart(2, '0');
+            const m = months[dateObj.getMonth()];
+            const hh = dateObj.getHours().toString().padStart(2, '0');
+            const mm = dateObj.getMinutes().toString().padStart(2, '0');
+            return `${d}/${m} ${hh}:${mm}`;
+        }
+
+        function resizeGameCanvas() {
+            if (!container || !canvas) return;
+            const rect = container.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            player.y = canvas.height - player.height - 16;
+            if (!gameRunning) {
+                player.x = (canvas.width - player.width) / 2;
+                drawIdleScene();
+            }
+        }
+
+        window.addEventListener('resize', resizeGameCanvas);
+
+        function drawIdleScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawOfficeGrid();
+            drawPlayerBadge();
+        }
+
+        function drawOfficeGrid() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            const step = 36;
+            for (let x = 0; x < canvas.width; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawPlayerBadge() {
+            ctx.save();
+            ctx.fillStyle = '#E5E7EB';
+            ctx.beginPath();
+            ctx.roundRect(player.x + player.width / 2 - 12, player.y - 8, 24, 10, 4);
+            ctx.fill();
+
+            ctx.shadowColor = 'rgba(247, 214, 81, 0.55)';
+            ctx.shadowBlur = 14;
+            ctx.fillStyle = '#F7D651';
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(player.x, player.y, player.width, player.height, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#5E2379';
+            ctx.beginPath();
+            ctx.roundRect(player.x + 6, player.y + 6, player.width - 12, 10, 4);
+            ctx.fill();
+
+            ctx.fillStyle = '#111111';
+            ctx.font = 'bold 21px "Caveat", cursive';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('(casi)', player.x + player.width / 2, player.y + 30);
+            ctx.restore();
+        }
+
+        function spawnItem() {
+            const types = [
+                {
+                    kind: 'coffee',
+                    label: 'CAFÉ',
+                    points: 10,
+                    radius: 23,
+                    bg: '#065F46',
+                    border: '#34D399',
+                    glow: 'rgba(52, 211, 153, 0.5)',
+                    badgeText: '+10',
+                    badgeBg: '#10B981',
+                    symbol: '☕'
+                },
+                {
+                    kind: 'bonus',
+                    label: 'BONO',
+                    points: 25,
+                    radius: 24,
+                    bg: '#78350F',
+                    border: '#F7D651',
+                    glow: 'rgba(247, 214, 81, 0.6)',
+                    badgeText: '+25',
+                    badgeBg: '#F7D651',
+                    symbol: '🏅'
+                },
+                {
+                    kind: 'report',
+                    label: 'REPORTE',
+                    points: 0,
+                    radius: 25,
+                    bg: '#881337',
+                    border: '#FB7185',
+                    glow: 'rgba(251, 113, 133, 0.65)',
+                    badgeText: 'RH!',
+                    badgeBg: '#F43F5E',
+                    symbol: '📄'
+                },
+                {
+                    kind: 'meeting',
+                    label: 'JUNTA',
+                    points: 0,
+                    radius: 25,
+                    bg: '#7C2D12',
+                    border: '#FB923C',
+                    glow: 'rgba(251, 146, 60, 0.6)',
+                    badgeText: '5:59',
+                    badgeBg: '#F97316',
+                    symbol: '⏰'
+                }
+            ];
+
+            const rand = Math.random();
+            let chosen;
+            if (rand < 0.36) chosen = types[0];
+            else if (rand < 0.50) chosen = types[1];
+            else if (rand < 0.78) chosen = types[2];
+            else chosen = types[3];
+
+            const margin = 30;
+            const x = margin + Math.random() * (canvas.width - margin * 2);
+
+            fallingItems.push({
+                ...chosen,
+                x: x,
+                y: -30,
+                speed: (2.7 + Math.random() * 1.9) * difficultyMultiplier
+            });
+        }
+
+        function drawFallingItem(item) {
+            ctx.save();
+            ctx.shadowColor = item.glow;
+            ctx.shadowBlur = 14;
+            ctx.fillStyle = item.bg;
+            ctx.strokeStyle = item.border;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+            ctx.font = '22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(item.symbol, item.x, item.y - 1);
+
+            const pillW = 34;
+            const pillH = 14;
+            ctx.fillStyle = item.badgeBg;
+            ctx.beginPath();
+            ctx.roundRect(item.x - pillW / 2, item.y + item.radius - 7, pillW, pillH, 7);
+            ctx.fill();
+
+            ctx.fillStyle = (item.badgeBg === '#F7D651' || item.badgeBg === '#10B981') ? '#111111' : '#FFFFFF';
+            ctx.font = '900 9px Montserrat, sans-serif';
+            ctx.fillText(item.badgeText, item.x, item.y + item.radius + 0.5);
+
+            ctx.restore();
+        }
+
+        function startGame() {
+            resizeGameCanvas();
+            score = 0;
+            elapsedSeconds = 0;
+            gameStartTime = Date.now();
+            difficultyMultiplier = 1;
+            currentEsquivaLevel = 1;
+            fallingItems = [];
+            spawnTimer = 0;
+            player.x = (canvas.width - player.width) / 2;
+
+            document.getElementById('current-score-display').textContent = '0';
+            document.getElementById('current-time-display').textContent = '00:00';
+            document.getElementById('esquiva-level-display').textContent = '1';
+            document.getElementById('esquiva-level-banner').classList.add('hidden');
+            document.getElementById('game-start-overlay').classList.add('hidden');
+            document.getElementById('game-over-overlay').classList.add('hidden');
+            document.getElementById('game-over-overlay').classList.remove('flex');
+
+            gameRunning = true;
+            cancelAnimationFrame(animationFrameId);
+            gameLoop();
+        }
+
+        function stopGame() {
+            gameRunning = false;
+            cancelAnimationFrame(animationFrameId);
+        }
+
+        function renderScoreboard(latestEntryId) {
+            const tbody = document.getElementById('scoreboard-tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = scoreHistory.map((entry, idx) => {
+                const isLatest = entry.id === latestEntryId;
+                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+                return `
+                    <tr class="${isLatest ? 'bg-brand-yellow/15 font-extrabold text-white' : ''}">
+                        <td class="py-1.5 px-2.5">${medal}</td>
+                        <td class="py-1.5 px-2 text-brand-yellow font-black">${entry.score} pts</td>
+                        <td class="py-1.5 px-2 text-[#5CE1E6] font-bold">${entry.duration}</td>
+                        <td class="py-1.5 px-2.5 text-right text-gray-400">${entry.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function triggerGameOver(reason) {
+            stopGame();
+            const finalSeconds = Math.max(1, Math.floor((Date.now() - gameStartTime) / 1000));
+            const formattedDuration = formatDuration(finalSeconds);
+            const formattedDate = formatShortDate(new Date());
+
+            document.getElementById('game-over-reason').textContent = reason;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-duration').textContent = formattedDuration;
+
+            const entryId = Date.now();
+            scoreHistory.push({
+                id: entryId,
+                score: score,
+                duration: formattedDuration,
+                date: formattedDate
+            });
+            scoreHistory.sort((a, b) => b.score - a.score);
+            scoreHistory = scoreHistory.slice(0, 5);
+            localStorage.setItem('casi_desempleados_scores', JSON.stringify(scoreHistory));
+
+            renderScoreboard(entryId);
+
+            const recordBadge = document.getElementById('new-record-badge');
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('casi_desempleados_highscore', highScore);
+                document.getElementById('high-score-display').textContent = highScore;
+                recordBadge.classList.remove('hidden');
+
+                pushNotification(
+                    `🏆 ¡Nuevo récord personal: ${highScore} pts!`,
+                    `Sobreviviste ${formattedDuration} esquivando reportes de RH.`,
+                    'fa-trophy',
+                    'bg-brand-yellow text-gray-900'
+                );
+            } else {
+                recordBadge.classList.add('hidden');
+            }
+
+            const overOverlay = document.getElementById('game-over-overlay');
+            overOverlay.classList.remove('hidden');
+            overOverlay.classList.add('flex');
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawOfficeGrid();
+
+            const currentSecs = Math.floor((Date.now() - gameStartTime) / 1000);
+            if (currentSecs !== elapsedSeconds) {
+                elapsedSeconds = currentSecs;
+                document.getElementById('current-time-display').textContent = formatDuration(elapsedSeconds);
+            }
+
+            if (player.movingLeft) player.x -= player.speed;
+            if (player.movingRight) player.x += player.speed;
+
+            if (player.x < 8) player.x = 8;
+            if (player.x + player.width > canvas.width - 8) {
+                player.x = canvas.width - player.width - 8;
+            }
+
+            spawnTimer++;
+            const spawnRate = Math.max(15, Math.floor(42 / difficultyMultiplier));
+            if (spawnTimer >= spawnRate) {
+                spawnItem();
+                spawnTimer = 0;
+            }
+
+            for (let i = fallingItems.length - 1; i >= 0; i--) {
+                const item = fallingItems[i];
+                item.y += item.speed;
+                drawFallingItem(item);
+
+                const closestX = Math.max(player.x, Math.min(item.x, player.x + player.width));
+                const closestY = Math.max(player.y, Math.min(item.y, player.y + player.height));
+                const dx = item.x - closestX;
+                const dy = item.y - closestY;
+                const hit = (dx * dx + dy * dy) < (item.radius * item.radius);
+
+                if (hit) {
+                    if (item.kind === 'report') {
+                        triggerGameOver('Te cayó un reporte directo de Recursos Humanos.');
+                        return;
+                    } else if (item.kind === 'meeting') {
+                        triggerGameOver('Te atraparon en una junta de último minuto a las 5:59 PM.');
+                        return;
+                    } else {
+                        score += item.points;
+                        document.getElementById('current-score-display').textContent = score;
+
+                        const newLevel = Math.floor(score / 100) + 1;
+                        difficultyMultiplier = 1 + ((newLevel - 1) * 0.28);
+
+                        if (newLevel > currentEsquivaLevel) {
+                            currentEsquivaLevel = newLevel;
+                            document.getElementById('esquiva-level-display').textContent = currentEsquivaLevel;
+                            const lvlBanner = document.getElementById('esquiva-level-banner');
+                            lvlBanner.textContent = `⚡ ¡NIVEL ${currentEsquivaLevel}! +VELOCIDAD`;
+                            lvlBanner.classList.remove('hidden');
+                            clearTimeout(window._lvlBannerTimer);
+                            window._lvlBannerTimer = setTimeout(() => {
+                                lvlBanner.classList.add('hidden');
+                            }, 1800);
+                        }
+
+                        fallingItems.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                if (item.y - item.radius > canvas.height) {
+                    fallingItems.splice(i, 1);
+                }
+            }
+
+            drawPlayerBadge();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        // Controles táctiles
+        canvas.addEventListener('touchmove', (e) => {
+            if (!gameRunning) return;
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            player.x = touchX - player.width / 2;
+        }, { passive: false });
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (!gameRunning) return;
+            const rect = canvas.getBoundingClientRect();
+            const touchX = e.touches[0].clientX - rect.left;
+            player.x = touchX - player.width / 2;
+        }, { passive: true });
+
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+
+        btnLeft.addEventListener('touchstart', (e) => { e.preventDefault(); player.movingLeft = true; });
+        btnLeft.addEventListener('touchend', () => { player.movingLeft = false; });
+        btnLeft.addEventListener('mousedown', () => { player.movingLeft = true; });
+        btnLeft.addEventListener('mouseup', () => { player.movingLeft = false; });
+        btnLeft.addEventListener('mouseleave', () => { player.movingLeft = false; });
+
+        btnRight.addEventListener('touchstart', (e) => { e.preventDefault(); player.movingRight = true; });
+        btnRight.addEventListener('touchend', () => { player.movingRight = false; });
+        btnRight.addEventListener('mousedown', () => { player.movingRight = true; });
+        btnRight.addEventListener('mouseup', () => { player.movingRight = false; });
+        btnRight.addEventListener('mouseleave', () => { player.movingRight = false; });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') player.movingLeft = true;
+            if (e.key === 'ArrowRight' || e.key === 'd') player.movingRight = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') player.movingLeft = false;
+            if (e.key === 'ArrowRight' || e.key === 'd') player.movingRight = false;
+        });
+
+        // ==========================================
+        // 3B. MINIJUEGO B: "CHECA TARJETA"
+        // ==========================================
+        let checaRunning = false;
+        let checaAnimId = null;
+        let checaScore = 0;
+        let checaHighScore = parseInt(localStorage.getItem('casi_desempleados_checa_highscore') || '0', 10);
+        let checaHistory = JSON.parse(localStorage.getItem('casi_desempleados_checa_scores') || '[]');
+        let checaLives = 3;
+        let checaDay = 1;
+        let checaStartTime = 0;
+        let checaPos = 0;
+        let checaDir = 1;
+        let checaSpeed = 1.15;
+        let checaZoneLeft = 38;
+        let checaZoneWidth = 24;
+        let checaRoundPaused = false;
+
+        document.getElementById('checa-highscore-display').textContent = checaHighScore;
+
+        function updateChecaZones() {
+            checaZoneWidth = Math.max(11, 25 - (checaDay - 1) * 1.4);
+            const minLeft = 18;
+            const maxLeft = 82 - checaZoneWidth;
+            checaZoneLeft = Math.floor(minLeft + Math.random() * (maxLeft - minLeft));
+
+            const perfectWidth = Math.max(4, checaZoneWidth * 0.28);
+            const perfectLeft = checaZoneLeft + (checaZoneWidth - perfectWidth) / 2;
+
+            const greenEl = document.getElementById('checa-green-zone');
+            const perfectEl = document.getElementById('checa-perfect-zone');
+            greenEl.style.left = `${checaZoneLeft}%`;
+            greenEl.style.width = `${checaZoneWidth}%`;
+            perfectEl.style.left = `${perfectLeft}%`;
+            perfectEl.style.width = `${perfectWidth}%`;
+
+            checaSpeed = 1.1 + (checaDay - 1) * 0.22;
+            document.getElementById('checa-speed-badge').textContent = `Vel. ${(1 + (checaDay - 1) * 0.2).toFixed(1)}x`;
+            document.getElementById('checa-day-display').textContent = checaDay;
+        }
+
+        function startChecaGame() {
+            checaScore = 0;
+            checaLives = 3;
+            checaDay = 1;
+            checaPos = 0;
+            checaDir = 1;
+            checaRoundPaused = false;
+            checaStartTime = Date.now();
+
+            document.getElementById('checa-score-display').textContent = '0';
+            document.getElementById('checa-lives-display').textContent = '❤️❤️❤️';
+            document.getElementById('checa-feedback-text').textContent = '¡Toca CHECAR justo en la zona verde!';
+            document.getElementById('checa-feedback-text').className = 'text-xs font-extrabold text-brand-yellow mt-1 h-4';
+            document.getElementById('checa-btn-label').textContent = '¡CHECAR ENTRADA!';
+            document.getElementById('checa-gameover-overlay').classList.add('hidden');
+            document.getElementById('checa-gameover-overlay').classList.remove('flex');
+
+            updateChecaZones();
+            checaRunning = true;
+            cancelAnimationFrame(checaAnimId);
+            checaLoop();
+        }
+
+        function stopChecaLoop() {
+            checaRunning = false;
+            cancelAnimationFrame(checaAnimId);
+        }
+
+        function checaLoop() {
+            if (!checaRunning) return;
+
+            if (!checaRoundPaused) {
+                checaPos += checaDir * checaSpeed;
+                if (checaPos >= 98) {
+                    checaPos = 98;
+                    checaDir = -1;
+                } else if (checaPos <= 0) {
+                    checaPos = 0;
+                    checaDir = 1;
+                }
+
+                const needle = document.getElementById('checa-needle');
+                if (needle) needle.style.left = `${checaPos}%`;
+
+                const totalMinutes = Math.round(45 + (checaPos / 98) * 30);
+                const hour = totalMinutes >= 60 ? '09' : '08';
+                const mins = (totalMinutes % 60).toString().padStart(2, '0');
+                const clockEl = document.getElementById('checa-clock-readout');
+                if (clockEl) clockEl.textContent = `${hour}:${mins} AM`;
+            }
+
+            checaAnimId = requestAnimationFrame(checaLoop);
+        }
+
+        function handleChecaAction() {
+            if (!checaRunning) {
+                startChecaGame();
+                return;
+            }
+            if (checaRoundPaused) return;
+
+            checaRoundPaused = true;
+            const zoneEnd = checaZoneLeft + checaZoneWidth;
+            const zoneCenter = checaZoneLeft + checaZoneWidth / 2;
+            const distFromCenter = Math.abs(checaPos - zoneCenter);
+            const perfectHalf = Math.max(2, checaZoneWidth * 0.16);
+            const fbEl = document.getElementById('checa-feedback-text');
+
+            if (distFromCenter <= perfectHalf) {
+                checaScore += 50;
+                checaDay++;
+                fbEl.textContent = '🌟 ¡09:00 EN PUNTO! +50 PTS';
+                fbEl.className = 'text-xs font-black text-brand-yellow mt-1 h-4';
+            } else if (checaPos >= checaZoneLeft && checaPos <= zoneEnd) {
+                checaScore += 25;
+                checaDay++;
+                fbEl.textContent = '✅ ¡A tiempo! +25 PTS';
+                fbEl.className = 'text-xs font-extrabold text-emerald-400 mt-1 h-4';
+            } else {
+                checaLives--;
+                document.getElementById('checa-lives-display').textContent = '❤️'.repeat(Math.max(0, checaLives)) || '💔';
+                fbEl.textContent = checaPos > zoneEnd ? '🚨 ¡RETARDO! RH tomó nota (-1 vida)' : '⚠️ ¡Demasiado temprano! (-1 vida)';
+                fbEl.className = 'text-xs font-extrabold text-rose-400 mt-1 h-4';
+
+                if (checaLives <= 0) {
+                    setTimeout(triggerChecaGameOver, 650);
+                    return;
+                }
+            }
+
+            document.getElementById('checa-score-display').textContent = checaScore;
+
+            setTimeout(() => {
+                if (!checaRunning) return;
+                updateChecaZones();
+                checaRoundPaused = false;
+            }, 650);
+        }
+
+        function renderChecaScoreboard(latestId) {
+            const tbody = document.getElementById('checa-scoreboard-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = checaHistory.map((entry, idx) => {
+                const isLatest = entry.id === latestId;
+                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+                return `
+                    <tr class="${isLatest ? 'bg-brand-yellow/15 font-extrabold text-white' : ''}">
+                        <td class="py-1.5 px-2.5">${medal}</td>
+                        <td class="py-1.5 px-2 text-brand-yellow font-black">${entry.score} pts</td>
+                        <td class="py-1.5 px-2 text-[#5CE1E6] font-bold">${entry.duration}</td>
+                        <td class="py-1.5 px-2.5 text-right text-gray-400">${entry.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function triggerChecaGameOver() {
+            stopChecaLoop();
+            const finalSecs = Math.max(1, Math.floor((Date.now() - checaStartTime) / 1000));
+            const formattedDuration = formatDuration(finalSecs);
+            const formattedDate = formatShortDate(new Date());
+
+            document.getElementById('checa-final-score').textContent = checaScore;
+            document.getElementById('checa-final-duration').textContent = formattedDuration;
+
+            const entryId = Date.now();
+            checaHistory.push({
+                id: entryId,
+                score: checaScore,
+                duration: formattedDuration,
+                date: formattedDate
+            });
+            checaHistory.sort((a, b) => b.score - a.score);
+            checaHistory = checaHistory.slice(0, 5);
+            localStorage.setItem('casi_desempleados_checa_scores', JSON.stringify(checaHistory));
+            renderChecaScoreboard(entryId);
+
+            const recBadge = document.getElementById('checa-new-record-badge');
+            if (checaScore > checaHighScore) {
+                checaHighScore = checaScore;
+                localStorage.setItem('casi_desempleados_checa_highscore', checaHighScore);
+                document.getElementById('checa-highscore-display').textContent = checaHighScore;
+                recBadge.classList.remove('hidden');
+
+                pushNotification(
+                    `⏱️ ¡Récord en Checa Tarjeta: ${checaHighScore} pts!`,
+                    `Llegaste hasta el día ${checaDay} sin que RH te levantara acta.`,
+                    'fa-stopwatch',
+                    'bg-brand-teal text-white'
+                );
+            } else {
+                recBadge.classList.add('hidden');
+            }
+
+            const overEl = document.getElementById('checa-gameover-overlay');
+            overEl.classList.remove('hidden');
+            overEl.classList.add('flex');
+        }
+
+        // ==========================================
+        // 3C. MINIJUEGO C: "ARCHIVERO TETRIS"
+        // ==========================================
+        const tCanvas = document.getElementById('tetrisCanvas');
+        const tCtx = tCanvas ? tCanvas.getContext('2d') : null;
+        const tNextCanvas = document.getElementById('tetrisNextCanvas');
+        const tNextCtx = tNextCanvas ? tNextCanvas.getContext('2d') : null;
+
+        const T_COLS = 10;
+        const T_ROWS = 18;
+        const T_BLOCK = 19;
+
+        const TETROMINOES = [
+            { shape: [[1, 1, 1, 1]], color: '#5CE1E6' },
+            { shape: [[1, 1], [1, 1]], color: '#F7D651' },
+            { shape: [[0, 1, 0], [1, 1, 1]], color: '#9D4EDD' },
+            { shape: [[1, 0, 0], [1, 1, 1]], color: '#1B6C8A' },
+            { shape: [[0, 0, 1], [1, 1, 1]], color: '#F97316' },
+            { shape: [[0, 1, 1], [1, 1, 0]], color: '#10B981' },
+            { shape: [[1, 1, 0], [0, 1, 1]], color: '#F43F5E' }
+        ];
+
+        let tetrisBoard = [];
+        let tetrisRunning = false;
+        let tetrisAnimId = null;
+        let tetrisScore = 0;
+        let tetrisLines = 0;
+        let tetrisLevel = 1;
+        let tetrisStartTime = 0;
+        let tetrisLastDrop = 0;
+        let tetrisDropInterval = 680;
+        let tetrisLockDeadline = 0;
+        let tetrisCurrent = null;
+        let tetrisNext = null;
+        let tetrisHighScore = parseInt(localStorage.getItem('casi_desempleados_tetris_highscore') || '0', 10);
+        let tetrisHistory = JSON.parse(localStorage.getItem('casi_desempleados_tetris_scores') || '[]');
+
+        if (document.getElementById('tetris-highscore-display')) {
+            document.getElementById('tetris-highscore-display').textContent = tetrisHighScore;
+        }
+
+        function createEmptyTetrisBoard() {
+            return Array.from({ length: T_ROWS }, () => Array(T_COLS).fill(null));
+        }
+
+        function randomTetrisPiece() {
+            const template = TETROMINOES[Math.floor(Math.random() * TETROMINOES.length)];
+            const matrix = template.shape.map(row => [...row]);
+            return {
+                matrix,
+                color: template.color,
+                x: Math.floor((T_COLS - matrix[0].length) / 2),
+                y: 0
+            };
+        }
+
+        function drawTetrisBlock(ctxTarget, gx, gy, size, color) {
+            ctxTarget.fillStyle = color;
+            ctxTarget.beginPath();
+            ctxTarget.roundRect(gx * size + 1, gy * size + 1, size - 2, size - 2, 4);
+            ctxTarget.fill();
+
+            ctxTarget.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctxTarget.lineWidth = 1;
+            ctxTarget.stroke();
+        }
+
+        function drawTetrisNextPiece() {
+            if (!tNextCtx || !tetrisNext) return;
+            tNextCtx.clearRect(0, 0, tNextCanvas.width, tNextCanvas.height);
+            const pSize = 16;
+            const offsetX = Math.floor((tNextCanvas.width - tetrisNext.matrix[0].length * pSize) / 2);
+            const offsetY = Math.floor((tNextCanvas.height - tetrisNext.matrix.length * pSize) / 2);
+
+            tetrisNext.matrix.forEach((row, r) => {
+                row.forEach((val, c) => {
+                    if (val) {
+                        tNextCtx.fillStyle = tetrisNext.color;
+                        tNextCtx.beginPath();
+                        tNextCtx.roundRect(offsetX + c * pSize + 1, offsetY + r * pSize + 1, pSize - 2, pSize - 2, 4);
+                        tNextCtx.fill();
+                    }
+                });
+            });
+        }
+
+        function drawTetrisBoard() {
+            if (!tCtx) return;
+            tCtx.clearRect(0, 0, tCanvas.width, tCanvas.height);
+
+            tCtx.strokeStyle = 'rgba(255,255,255,0.04)';
+            tCtx.lineWidth = 1;
+            for (let r = 0; r < T_ROWS; r++) {
+                for (let c = 0; c < T_COLS; c++) {
+                    tCtx.strokeRect(c * T_BLOCK, r * T_BLOCK, T_BLOCK, T_BLOCK);
+                    if (tetrisBoard[r] && tetrisBoard[r][c]) {
+                        drawTetrisBlock(tCtx, c, r, T_BLOCK, tetrisBoard[r][c]);
+                    }
+                }
+            }
+
+            if (tetrisCurrent) {
+                tetrisCurrent.matrix.forEach((row, r) => {
+                    row.forEach((val, c) => {
+                        if (val) {
+                            drawTetrisBlock(tCtx, tetrisCurrent.x + c, tetrisCurrent.y + r, T_BLOCK, tetrisCurrent.color);
+                        }
+                    });
+                });
+            }
+        }
+
+        function tetrisCollide(piece, offsetX = 0, offsetY = 0, testMatrix = piece.matrix) {
+            for (let r = 0; r < testMatrix.length; r++) {
+                for (let c = 0; c < testMatrix[r].length; c++) {
+                    if (!testMatrix[r][c]) continue;
+                    const newX = piece.x + c + offsetX;
+                    const newY = piece.y + r + offsetY;
+                    if (newX < 0 || newX >= T_COLS || newY >= T_ROWS) return true;
+                    if (newY >= 0 && tetrisBoard[newY][newX]) return true;
+                }
+            }
+            return false;
+        }
+
+        function mergeTetrisPiece() {
+            tetrisCurrent.matrix.forEach((row, r) => {
+                row.forEach((val, c) => {
+                    if (val && tetrisCurrent.y + r >= 0) {
+                        tetrisBoard[tetrisCurrent.y + r][tetrisCurrent.x + c] = tetrisCurrent.color;
+                    }
+                });
+            });
+        }
+
+        function clearTetrisLines() {
+            let cleared = 0;
+            for (let r = T_ROWS - 1; r >= 0; r--) {
+                if (tetrisBoard[r].every(cell => cell !== null)) {
+                    tetrisBoard.splice(r, 1);
+                    tetrisBoard.unshift(Array(T_COLS).fill(null));
+                    cleared++;
+                    r++;
+                }
+            }
+
+            if (cleared > 0) {
+                const pointsMap = [0, 50, 120, 220, 400];
+                tetrisScore += pointsMap[cleared] || (cleared * 100);
+                tetrisLines += cleared;
+                tetrisLevel = Math.floor(tetrisScore / 100) + 1;
+                tetrisDropInterval = Math.max(150, 680 - (tetrisLevel - 1) * 65);
+
+                document.getElementById('tetris-score-display').textContent = tetrisScore;
+                document.getElementById('tetris-lines-display').textContent = tetrisLines;
+                document.getElementById('tetris-level-display').textContent = tetrisLevel;
+            }
+        }
+
+        function tetrisMove(dir) {
+            if (!tetrisRunning || !tetrisCurrent) return;
+            if (!tetrisCollide(tetrisCurrent, dir, 0)) {
+                tetrisCurrent.x += dir;
+                if (tetrisLockDeadline > 0 && tetrisCollide(tetrisCurrent, 0, 1)) {
+                    tetrisLockDeadline = performance.now() + 450;
+                }
+                drawTetrisBoard();
+            }
+        }
+
+        function tetrisRotate() {
+            if (!tetrisRunning || !tetrisCurrent) return;
+            const rotated = tetrisCurrent.matrix[0].map((_, idx) =>
+                tetrisCurrent.matrix.map(row => row[idx]).reverse()
+            );
+            if (!tetrisCollide(tetrisCurrent, 0, 0, rotated)) {
+                tetrisCurrent.matrix = rotated;
+                if (tetrisLockDeadline > 0 && tetrisCollide(tetrisCurrent, 0, 1)) {
+                    tetrisLockDeadline = performance.now() + 450;
+                }
+                drawTetrisBoard();
+            }
+        }
+
+        function lockAndSpawnTetrisPiece() {
+            tetrisLockDeadline = 0;
+            mergeTetrisPiece();
+            clearTetrisLines();
+            tetrisCurrent = tetrisNext;
+            tetrisNext = randomTetrisPiece();
+            drawTetrisNextPiece();
+
+            if (tetrisCollide(tetrisCurrent, 0, 0)) {
+                triggerTetrisGameOver();
+                return;
+            }
+            tetrisLastDrop = performance.now();
+            drawTetrisBoard();
+        }
+
+        function tetrisDrop() {
+            if (!tetrisRunning || !tetrisCurrent) return;
+            if (!tetrisCollide(tetrisCurrent, 0, 1)) {
+                tetrisCurrent.y++;
+                tetrisLockDeadline = 0;
+            } else {
+                lockAndSpawnTetrisPiece();
+                return;
+            }
+            tetrisLastDrop = performance.now();
+            drawTetrisBoard();
+        }
+
+        function tetrisHardDrop() {
+            if (!tetrisRunning || !tetrisCurrent) return;
+            while (!tetrisCollide(tetrisCurrent, 0, 1)) {
+                tetrisCurrent.y++;
+            }
+            tetrisLockDeadline = performance.now() + 450;
+            tetrisLastDrop = performance.now();
+            drawTetrisBoard();
+        }
+
+        function startTetrisGame() {
+            tetrisBoard = createEmptyTetrisBoard();
+            tetrisScore = 0;
+            tetrisLines = 0;
+            tetrisLevel = 1;
+            tetrisDropInterval = 680;
+            tetrisLockDeadline = 0;
+            tetrisStartTime = Date.now();
+            tetrisCurrent = randomTetrisPiece();
+            tetrisNext = randomTetrisPiece();
+
+            document.getElementById('tetris-score-display').textContent = '0';
+            document.getElementById('tetris-lines-display').textContent = '0';
+            document.getElementById('tetris-level-display').textContent = '1';
+            document.getElementById('tetris-time-display').textContent = '00:00';
+            document.getElementById('tetris-start-overlay').classList.add('hidden');
+            document.getElementById('tetris-gameover-overlay').classList.add('hidden');
+            document.getElementById('tetris-gameover-overlay').classList.remove('flex');
+
+            drawTetrisNextPiece();
+            drawTetrisBoard();
+
+            tetrisRunning = true;
+            tetrisLastDrop = performance.now();
+            cancelAnimationFrame(tetrisAnimId);
+            tetrisLoop(tetrisLastDrop);
+        }
+
+        function stopTetrisLoop() {
+            tetrisRunning = false;
+            cancelAnimationFrame(tetrisAnimId);
+        }
+
+        function tetrisLoop(now) {
+            if (!tetrisRunning) return;
+
+            const elapsed = Math.floor((Date.now() - tetrisStartTime) / 1000);
+            const timeEl = document.getElementById('tetris-time-display');
+            if (timeEl) timeEl.textContent = formatDuration(elapsed);
+
+            if (tetrisLockDeadline > 0) {
+                if (!tetrisCollide(tetrisCurrent, 0, 1)) {
+                    tetrisLockDeadline = 0;
+                    tetrisLastDrop = now;
+                } else if (now >= tetrisLockDeadline) {
+                    lockAndSpawnTetrisPiece();
+                }
+            } else if (now - tetrisLastDrop >= tetrisDropInterval) {
+                tetrisDrop();
+            }
+
+            tetrisAnimId = requestAnimationFrame(tetrisLoop);
+        }
+
+        function renderTetrisScoreboard(latestId) {
+            const tbody = document.getElementById('tetris-scoreboard-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = tetrisHistory.map((entry, idx) => {
+                const isLatest = entry.id === latestId;
+                const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+                return `
+                    <tr class="${isLatest ? 'bg-brand-yellow/15 font-extrabold text-white' : ''}">
+                        <td class="py-1.5 px-2.5">${medal}</td>
+                        <td class="py-1.5 px-2 text-brand-yellow font-black">${entry.score} pts</td>
+                        <td class="py-1.5 px-2 text-[#5CE1E6] font-bold">${entry.duration}</td>
+                        <td class="py-1.5 px-2.5 text-right text-gray-400">${entry.date}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function triggerTetrisGameOver() {
+            stopTetrisLoop();
+            const finalSecs = Math.max(1, Math.floor((Date.now() - tetrisStartTime) / 1000));
+            const formattedDuration = formatDuration(finalSecs);
+            const formattedDate = formatShortDate(new Date());
+
+            document.getElementById('tetris-final-score').textContent = tetrisScore;
+            document.getElementById('tetris-final-duration').textContent = formattedDuration;
+
+            const entryId = Date.now();
+            tetrisHistory.push({
+                id: entryId,
+                score: tetrisScore,
+                duration: formattedDuration,
+                date: formattedDate
+            });
+            tetrisHistory.sort((a, b) => b.score - a.score);
+            tetrisHistory = tetrisHistory.slice(0, 5);
+            localStorage.setItem('casi_desempleados_tetris_scores', JSON.stringify(tetrisHistory));
+            renderTetrisScoreboard(entryId);
+
+            const recBadge = document.getElementById('tetris-new-record-badge');
+            if (tetrisScore > tetrisHighScore) {
+                tetrisHighScore = tetrisScore;
+                localStorage.setItem('casi_desempleados_tetris_highscore', tetrisHighScore);
+                document.getElementById('tetris-highscore-display').textContent = tetrisHighScore;
+                recBadge.classList.remove('hidden');
+
+                pushNotification(
+                    `📦 ¡Récord en Archivero Tetris: ${tetrisHighScore} pts!`,
+                    `Archivaste ${tetrisLines} líneas antes de que se llenara el escritorio.`,
+                    'fa-cubes-stacked',
+                    'bg-brand-yellow text-gray-900'
+                );
+            } else {
+                recBadge.classList.add('hidden');
+            }
+
+            const overEl = document.getElementById('tetris-gameover-overlay');
+            overEl.classList.remove('hidden');
+            overEl.classList.add('flex');
+        }
+
+        // ==========================================
+        // 4. GENERADOR DE TARJETA COMPARTIBLE (PNG)
+        // ==========================================
+        let shareCardData = {
+            gameTitle: 'Esquiva el Reporte',
+            score: 0,
+            duration: '00:00',
+            playerName: localStorage.getItem('casi_desempleados_player_name') || 'Godín Anónimo'
+        };
+
+        function shareGameScore(gameKey = 'esquiva') {
+            if (gameKey === 'checa') {
+                shareCardData.gameTitle = 'Checa Tarjeta';
+                shareCardData.score = document.getElementById('checa-final-score').textContent || checaScore;
+                shareCardData.duration = document.getElementById('checa-final-duration').textContent || '00:00';
+            } else if (gameKey === 'tetris') {
+                shareCardData.gameTitle = 'Archivero Tetris';
+                shareCardData.score = document.getElementById('tetris-final-score').textContent || tetrisScore;
+                shareCardData.duration = document.getElementById('tetris-final-duration').textContent || '00:00';
+            } else {
+                shareCardData.gameTitle = 'Esquiva el Reporte';
+                shareCardData.score = document.getElementById('final-score').textContent || score;
+                shareCardData.duration = document.getElementById('final-duration').textContent || '00:00';
+            }
+
+            const nameInput = document.getElementById('share-player-name');
+            if (nameInput) nameInput.value = shareCardData.playerName;
+
+            renderShareCardCanvas();
+            document.getElementById('share-score-modal').classList.remove('hidden');
+        }
+
+        function updateShareCardName(val) {
+            shareCardData.playerName = val.trim() || 'Godín Anónimo';
+            localStorage.setItem('casi_desempleados_player_name', shareCardData.playerName);
+            renderShareCardCanvas();
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-score-modal').classList.add('hidden');
+        }
+
+        function renderShareCardCanvas() {
+            const sc = document.getElementById('shareCardCanvas');
+            if (!sc) return;
+            const sctx = sc.getContext('2d');
+            const W = sc.width;
+            const H = sc.height;
+
+            const bgGrad = sctx.createLinearGradient(0, 0, W, H);
+            bgGrad.addColorStop(0, '#1B162B');
+            bgGrad.addColorStop(0.55, '#100E17');
+            bgGrad.addColorStop(1, '#122938');
+            sctx.fillStyle = bgGrad;
+            sctx.fillRect(0, 0, W, H);
+
+            sctx.strokeStyle = 'rgba(247, 214, 81, 0.35)';
+            sctx.lineWidth = 6;
+            sctx.beginPath();
+            sctx.roundRect(24, 24, W - 48, H - 48, 36);
+            sctx.stroke();
+
+            sctx.fillStyle = '#5E2379';
+            sctx.fillRect(110, 125, 220, 66);
+            sctx.fillStyle = '#1B6C8A';
+            sctx.fillRect(330, 125, 280, 66);
+
+            sctx.fillStyle = '#FFFFFF';
+            sctx.font = '800 42px Montserrat, sans-serif';
+            sctx.textAlign = 'center';
+            sctx.textBaseline = 'middle';
+            sctx.fillText('DESEMPLEADOS', 360, 160);
+
+            sctx.save();
+            sctx.translate(150, 68);
+            sctx.rotate(-7 * Math.PI / 180);
+            sctx.fillStyle = '#F7D651';
+            sctx.beginPath();
+            sctx.roundRect(0, 0, 126, 72, 6);
+            sctx.fill();
+            sctx.fillStyle = '#111111';
+            sctx.font = '700 46px Caveat, cursive';
+            sctx.fillText('(casi)', 63, 40);
+            sctx.restore();
+
+            sctx.fillStyle = 'rgba(94, 35, 121, 0.65)';
+            sctx.beginPath();
+            sctx.roundRect(170, 235, 380, 48, 24);
+            sctx.fill();
+            sctx.fillStyle = '#F7D651';
+            sctx.font = '800 22px Montserrat, sans-serif';
+            sctx.fillText(shareCardData.gameTitle.toUpperCase(), 360, 260);
+
+            sctx.fillStyle = '#9CA3AF';
+            sctx.font = '700 20px Montserrat, sans-serif';
+            sctx.fillText('JUGADOR', 360, 330);
+
+            sctx.fillStyle = '#FFFFFF';
+            sctx.font = '900 38px Montserrat, sans-serif';
+            sctx.fillText(shareCardData.playerName, 360, 376);
+
+            sctx.fillStyle = '#1C1927';
+            sctx.strokeStyle = 'rgba(255,255,255,0.14)';
+            sctx.lineWidth = 3;
+            sctx.beginPath();
+            sctx.roundRect(80, 425, 560, 210, 28);
+            sctx.fill();
+            sctx.stroke();
+
+            sctx.fillStyle = '#9CA3AF';
+            sctx.font = '800 20px Montserrat, sans-serif';
+            sctx.fillText('PUNTAJE FINAL', 225, 478);
+            sctx.fillStyle = '#F7D651';
+            sctx.font = '900 68px Montserrat, sans-serif';
+            sctx.fillText(String(shareCardData.score), 225, 555);
+
+            sctx.fillStyle = 'rgba(255,255,255,0.15)';
+            sctx.fillRect(360, 460, 2, 140);
+
+            sctx.fillStyle = '#9CA3AF';
+            sctx.font = '800 20px Montserrat, sans-serif';
+            sctx.fillText('TIEMPO', 495, 478);
+            sctx.fillStyle = '#5CE1E6';
+            sctx.font = '900 56px Montserrat, sans-serif';
+            sctx.fillText(String(shareCardData.duration), 495, 555);
+
+            sctx.save();
+            sctx.translate(95, 685);
+            sctx.rotate(-1.2 * Math.PI / 180);
+            sctx.fillStyle = '#F7D651';
+            sctx.beginPath();
+            sctx.roundRect(0, 0, 530, 128, 20);
+            sctx.fill();
+
+            sctx.fillStyle = '#111111';
+            sctx.font = '700 38px Caveat, cursive';
+            sctx.fillText('¿Crees poder superar mi récord?', 265, 44);
+            sctx.font = '800 21px Montserrat, sans-serif';
+            sctx.fillText('Entra a la app de (casi) Desempleados y juega', 265, 92);
+            sctx.restore();
+        }
+
+        async function triggerNativeImageShare() {
+            const sc = document.getElementById('shareCardCanvas');
+            if (!sc) return;
+
+            const shareText = `🏆 Hice ${shareCardData.score} pts (${shareCardData.duration}) en ${shareCardData.gameTitle} de (casi) Desempleados. ¿Puedes superar mi récord?`;
+
+            try {
+                const blob = await new Promise(resolve => sc.toBlob(resolve, 'image/png'));
+                const file = new File([blob], 'record-casi-desempleados.png', { type: 'image/png' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Récord en (casi) Desempleados',
+                        text: shareText,
+                        files: [file]
+                    });
+                    return;
+                }
+            } catch (err) {}
+
+            downloadShareCardImage();
+            showToast('Imagen descargada para que la compartas en tus redes');
+        }
+
+        function downloadShareCardImage() {
+            const sc = document.getElementById('shareCardCanvas');
+            if (!sc) return;
+            const link = document.createElement('a');
+            link.download = `record-casi-desempleados-${Date.now()}.png`;
+            link.href = sc.toDataURL('image/png');
+            link.click();
+            showToast('📸 Tarjeta descargada en PNG');
+        }
+
+        // ==========================================
+        // 5. MODAL BANNER E INICIALIZACIÓN GLOBAL
+        // ==========================================
+        function showAdInfo() {
+            document.getElementById('ad-modal').classList.remove('hidden');
+        }
+
+        function closeAdModal() {
+            document.getElementById('ad-modal').classList.add('hidden');
+        }
+
+        // ==========================================
+        // 6. CONFIGURACIÓN DINÁMICA PWA (ÍCONO Y MANIFIESTO)
+        // ==========================================
+        function setupPWAMetadata() {
+            try {
+                const iconCanvas = document.createElement('canvas');
+                iconCanvas.width = 512;
+                iconCanvas.height = 512;
+                const ictx = iconCanvas.getContext('2d');
+
+                ictx.fillStyle = '#09080D';
+                ictx.fillRect(0, 0, 512, 512);
+
+                ictx.fillStyle = '#5E2379';
+                ictx.fillRect(76, 295, 180, 96);
+                ictx.fillStyle = '#1B6C8A';
+                ictx.fillRect(256, 295, 180, 96);
+
+                ictx.save();
+                ictx.translate(105, 108);
+                ictx.rotate(-7 * Math.PI / 180);
+                ictx.shadowColor = 'rgba(0,0,0,0.55)';
+                ictx.shadowBlur = 22;
+                ictx.shadowOffsetX = 6;
+                ictx.shadowOffsetY = 12;
+
+                ictx.fillStyle = '#F7D651';
+                ictx.beginPath();
+                ictx.moveTo(0, 0);
+                ictx.lineTo(235, 0);
+                ictx.lineTo(290, 55);
+                ictx.lineTo(290, 200);
+                ictx.lineTo(0, 200);
+                ictx.closePath();
+                ictx.fill();
+
+                ictx.shadowBlur = 0;
+                ictx.shadowOffsetX = 0;
+                ictx.shadowOffsetY = 0;
+                ictx.fillStyle = '#DFB624';
+                ictx.beginPath();
+                ictx.moveTo(235, 0);
+                ictx.lineTo(290, 55);
+                ictx.lineTo(235, 55);
+                ictx.closePath();
+                ictx.fill();
+
+                ictx.fillStyle = '#111111';
+                ictx.font = 'bold 118px Caveat, cursive';
+                ictx.textAlign = 'center';
+                ictx.textBaseline = 'middle';
+                ictx.fillText('(casi)', 142, 118);
+                ictx.restore();
+
+                const iconDataUrl = iconCanvas.toDataURL('image/png');
+                const appleIconLink = document.getElementById('pwa-apple-icon');
+                if (appleIconLink) appleIconLink.href = iconDataUrl;
+
+                const manifestObj = {
+                    name: '(casi) Desempleados',
+                    short_name: '(casi)',
+                    description: 'App oficial del programa (casi) Desempleados: episodios, buzón anónimo y minijuegos.',
+                    start_url: '.',
+                    display: 'standalone',
+                    background_color: '#100E17',
+                    theme_color: '#100E17',
+                    orientation: 'any',
+                    icons: [
+                        {
+                            src: iconDataUrl,
+                            sizes: '512x512',
+                            type: 'image/png',
+                            purpose: 'any maskable'
+                        }
+                    ]
+                };
+
+                const manifestBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+                const manifestUrl = URL.createObjectURL(manifestBlob);
+                const manifestLink = document.getElementById('pwa-manifest-link');
+                if (manifestLink) manifestLink.href = manifestUrl;
+            } catch (err) {}
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setupPWAMetadata();
+            initNotifications();
+            resizeGameCanvas();
+        });
+    </script>
+</body>
+</html>
