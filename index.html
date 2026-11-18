@@ -119,6 +119,10 @@
 
             <!-- Botones de Compartir y Notificaciones -->
             <div class="flex items-center gap-2">
+            <button id="lang-btn" onclick="toggleLang()" class="relative flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-brand-card hover:bg-white/10 text-brand-yellow transition active:scale-95" title="Idioma / Language">
+                <i class="fas fa-globe text-lg"></i>
+                <span id="lang-label" class="text-sm font-extrabold">EN</span>
+            </button>
             <button id="share-app-btn" onclick="shareApp()" class="relative p-2.5 rounded-full bg-brand-card hover:bg-white/10 text-brand-yellow transition active:scale-95" title="Compartir la app">
                 <i class="fas fa-share-nodes text-lg"></i>
             </button>
@@ -214,14 +218,14 @@
 
                 <!-- Tarjeta del último capítulo -->
                 <div class="rounded-2xl bg-brand-card border border-brand-yellow/40 p-4 shadow-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span id="ep-badge" class="px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider bg-brand-yellow text-gray-900 rounded-full">
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5 mb-2">
+                        <span id="ep-badge" class="px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider bg-brand-yellow text-gray-900 rounded-full whitespace-nowrap shrink-0">
                             Próximo capítulo
                         </span>
-                        <span id="ep-status" class="text-xs font-bold text-white/90">Viernes 20 de noviembre · 5:00 AM</span>
+                        <span id="ep-status" data-no-i18n class="text-xs font-bold text-white/90">Viernes 20 de noviembre · 5:00 AM</span>
                     </div>
-                    <h3 id="ep-title" class="text-lg font-extrabold text-white leading-snug">2.3: La Doble Vida</h3>
-                    <p class="text-sm text-gray-400 mt-1 leading-snug">Tenía otro trabajo de 3 a 7 de la mañana… y a las 7 de la noche desaparecía.</p>
+                    <h3 id="ep-title" data-no-i18n class="text-lg font-extrabold text-white leading-snug">2.3: La Doble Vida</h3>
+                    <p id="ep-teaser" data-no-i18n class="text-sm text-gray-400 mt-1 leading-snug">Tenía otro trabajo de 3 a 7 de la mañana… y a las 7 de la noche desaparecía.</p>
                     <div class="grid grid-cols-2 gap-2.5 mt-3.5">
                         <a id="ep-spotify" href="https://open.spotify.com/show/033LJFMZVKTVzYfKnDWQbr" target="_blank" rel="noopener noreferrer" onclick="handleExternalLink('Spotify')" class="py-2.5 px-3 rounded-xl bg-[#1DB954] hover:bg-[#1ed760] text-gray-950 font-extrabold text-sm flex items-center justify-center gap-2 shadow-md transition active:scale-95">
                             <i class="fab fa-spotify text-lg"></i>
@@ -344,7 +348,7 @@
                             <label for="buzon-alias" class="block text-xs font-extrabold uppercase tracking-wider text-gray-300 mb-1">
                                 Apodo o Pseudónimo (Opcional)
                             </label>
-                            <input id="buzon-alias" type="text" maxlength="40" placeholder="Ej. El Becario Asustado" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
+                            <input id="buzon-alias" type="text" maxlength="40" data-i18n-ph="Ej. El Becario Asustado" placeholder="Ej. El Becario Asustado" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
                         </div>
 
                         <div>
@@ -367,7 +371,7 @@
                             <label for="buzon-story" class="block text-xs font-extrabold uppercase tracking-wider text-gray-300 mb-1">
                                 Tu chismesito o historia *
                             </label>
-                            <textarea id="buzon-story" rows="4" required placeholder="Escribe aquí todo el contexto sin miedo..." class="w-full bg-brand-dark border border-white/15 rounded-xl p-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow resize-none"></textarea>
+                            <textarea id="buzon-story" rows="4" required data-i18n-ph="Escribe aquí todo el contexto sin miedo..." placeholder="Escribe aquí todo el contexto sin miedo..." class="w-full bg-brand-dark border border-white/15 rounded-xl p-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-yellow resize-none"></textarea>
                         </div>
 
                         <button id="buzon-submit-btn" type="submit" class="w-full py-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-sm shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
@@ -376,7 +380,7 @@
                         </button>
                     </form>
 
-                    <p id="buzon-pending" class="hidden text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 rounded-xl px-3 py-2"></p>
+                    <p id="buzon-pending" data-no-i18n class="hidden text-xs font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 rounded-xl px-3 py-2"></p>
 
                     <div id="buzon-success" class="hidden space-y-3 pt-1">
                         <div class="post-it p-4 rounded-2xl text-gray-900">
@@ -447,7 +451,7 @@
                             
                             <canvas id="gameCanvas" class="w-full h-full block"></canvas>
 
-                            <div id="esquiva-level-banner" class="hidden pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-brand-yellow text-gray-950 font-black text-xs shadow-lg z-20 animate-bounce">
+                            <div id="esquiva-level-banner" data-no-i18n class="hidden pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-brand-yellow text-gray-950 font-black text-xs shadow-lg z-20 animate-bounce">
                                 ⚡ ¡NIVEL 2! MÁS RÁPIDO
                             </div>
 
@@ -586,7 +590,7 @@
                             <div class="bg-black/70 border border-white/15 rounded-2xl p-3 text-center">
                                 <div class="flex items-center justify-between text-[11px] font-extrabold text-gray-400 uppercase mb-1">
                                     <span>Checador Biométrico RH</span>
-                                    <span id="checa-speed-badge" class="px-2 py-0.5 rounded bg-brand-teal/30 text-[#5CE1E6]">Vel. 1.0x</span>
+                                    <span id="checa-speed-badge" data-no-i18n class="px-2 py-0.5 rounded bg-brand-teal/30 text-[#5CE1E6]">Vel. 1.0x</span>
                                 </div>
                                 <div id="checa-clock-readout" class="text-4xl font-black tracking-wider text-white font-mono">
                                     08:55 AM
@@ -841,7 +845,7 @@
                     <label for="share-player-name" class="block text-[11px] font-extrabold uppercase tracking-wider text-gray-400 mb-1">
                         Tu nombre o apodo en la tarjeta
                     </label>
-                    <input id="share-player-name" type="text" maxlength="24" placeholder="Ej. El Godín Sobreviviente" oninput="updateShareCardName(this.value)" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3 py-2 text-sm text-white font-bold placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
+                    <input id="share-player-name" type="text" maxlength="24" data-i18n-ph="Ej. El Godín Sobreviviente" placeholder="Ej. El Godín Sobreviviente" oninput="updateShareCardName(this.value)" class="w-full bg-brand-dark border border-white/15 rounded-xl px-3 py-2 text-sm text-white font-bold placeholder-gray-500 focus:outline-none focus:border-brand-yellow">
                 </div>
 
                 <div class="bg-black/60 p-2 rounded-xl border border-white/10 flex justify-center">
@@ -866,6 +870,238 @@
     </div>
 
     <script>
+
+        /* ==========================================
+           IDIOMA / LANGUAGE (ES <-> EN)
+           Traduce la interfaz. El contenido del episodio
+           (titulo, teaser y fecha) se queda en espanol.
+           ========================================== */
+        const I18N_EN = {
+            "Inicio": "Home",
+            "Buzón": "Mailbox",
+            "Jugar": "Play",
+            "Notificaciones": "Notifications",
+            "Podcast Oficial": "Official Podcast",
+            "Escucha todos nuestros episodios": "Listen to all our episodes",
+            "Ir a Spotify": "Go to Spotify",
+            "El podcast para los que ya no quieren ponerse la camiseta. Casos de terror y dramas en la industria, con": "The podcast for those who no longer want to wear the company shirt. Workplace horror stories and industry dramas, with",
+            "Próximo capítulo": "Next episode",
+            "Escuchar en Spotify": "Listen on Spotify",
+            "Ver en YouTube": "Watch on YouTube",
+            "Comunidad y Redes": "Community & Socials",
+            "Tú votas el veredicto": "You vote the verdict",
+            "Cada capítulo, tú eres el juez. Comenta en el episodio con los emojis:": "Every episode, you're the judge. Comment on the episode with the emojis:",
+            "Gafetes (1 a 5):": "Badges (1 to 5):",
+            "1 chisme de oficina · 3 tragedia laboral · 5 historia épica": "1 office gossip · 3 workplace tragedy · 5 epic story",
+            "Reportes (1 a 5):": "Reports (1 to 5):",
+            "1 falta menor · 3 alerta roja de RH · 5 empresa radioactiva": "1 minor offense · 3 HR red alert · 5 radioactive company",
+            "Solo vine por el chisme": "I only came for the gossip",
+            "Lo escucho por la mañana": "I listen to it in the morning",
+            "¿Tienes un chismesito?": "Got a little gossip?",
+            "Mándanos tu historia anónima directo al buzón para leerla en el programa.": "Send us your anonymous story straight to the mailbox to read it on the show.",
+            "¿Sin nada que hacer?": "Nothing to do?",
+            "3 minijuegos godines para romper tu récord": "3 office minigames to break your record",
+            "100% Confidencial": "100% Confidential",
+            "Buzón de Chismes Anónimos": "Anonymous Gossip Mailbox",
+            "Cuéntanos tu tragedia laboral o confesión godín para leerla al aire.": "Tell us your workplace tragedy or office confession to read it on air.",
+            "Apodo o Pseudónimo (Opcional)": "Nickname or Pseudonym (Optional)",
+            "Privacidad al leerlo": "Privacy when reading it",
+            "Sí, por favor oculten mi información.": "Yes, please hide my information.",
+            "No importa, pueden decir mi apodo.": "It doesn't matter, you can say my nickname.",
+            "Tu chismesito o historia *": "Your gossip or story *",
+            "Enviar Chismesito Anónimo": "Send Anonymous Gossip",
+            "¡Recibido en cabina!": "Received in the studio!",
+            "Enviar otro chismesito": "Send another gossip",
+            "Esquiva": "Dodge",
+            "Checador": "Clock-in",
+            "Archivero": "Filing",
+            "Esquiva el Reporte": "Dodge the Report",
+            "Nivel": "Level",
+            "• +velocidad cada 100 pts": "• +speed every 100 pts",
+            "Tiempo": "Time",
+            "Récord": "Record",
+            "Puntos": "Points",
+            "Modo: Sin nada que hacer": "Mode: Nothing to do",
+            "Cada": "Every",
+            "100 puntos": "100 points",
+            "aumenta la velocidad de la oficina:": "the office speeds up:",
+            "Café vital": "Vital coffee",
+            "Bono Extra": "Extra bonus",
+            "¡Evita!": "Dodge it!",
+            "Reporte RH": "HR Report",
+            "Junta 5:59 PM": "5:59 PM Meeting",
+            "Iniciar Turno": "Start Shift",
+            "¡Te cayó Recursos Humanos!": "Human Resources got you!",
+            "Fin del Turno": "End of Shift",
+            "Te cayó un reporte administrativo.": "You got a write-up.",
+            "🎉 ¡Nuevo Récord Personal!": "🎉 New Personal Record!",
+            "Tabla de Puntajes": "Score Table",
+            "Top 5 turnos": "Top 5 shifts",
+            "Fecha": "Date",
+            "Reintentar": "Retry",
+            "Izquierda": "Left",
+            "Derecha": "Right",
+            "Checa Tarjeta": "Clock In",
+            "Día": "Day",
+            "• Detén el reloj en": "• Stop the clock at",
+            "Vidas": "Lives",
+            "Checador Biométrico RH": "HR Biometric Clock",
+            "¡Presiona CHECAR cuando pase por la zona verde!": "Press CLOCK IN when it passes through the green zone!",
+            "08:45 (Muy temprano)": "08:45 (Too early)",
+            "09:00 EN PUNTO": "09:00 SHARP",
+            "09:15 (Retardo)": "09:15 (Late)",
+            "En punto (+50 pts)": "Sharp (+50 pts)",
+            "A tiempo (+25 pts)": "On time (+25 pts)",
+            "INICIAR SEMANA": "START WEEK",
+            "3 Retardos Acumulados": "3 Late Arrivals",
+            "Acta Administrativa": "Write-up",
+            "Llegaste tarde demasiadas veces esta semana.": "You were late too many times this week.",
+            "Días / Tiempo": "Days / Time",
+            "🎉 ¡Nuevo Récord en Checa Tarjeta!": "🎉 New Record in Clock In!",
+            "Tabla Checa Tarjeta": "Clock In Table",
+            "Top 5 semanas": "Top 5 weeks",
+            "Nueva Semana": "New Week",
+            "Líneas": "Lines",
+            "Siguiente": "Next",
+            "Acomoda pendientes:": "Sort the pending tasks:",
+            "Completa filas horizontales para archivarlas y sumar puntos.": "Complete horizontal rows to file them and score points.",
+            "Modo: Ordenando el archivo": "Mode: Organizing the archive",
+            "Acomoda los bloques de carpetas y post-its. Cada": "Arrange the folder and sticky-note blocks. Every",
+            "caen más rápido.": "they fall faster.",
+            "Empezar a Archivar": "Start Filing",
+            "¡Se saturó el escritorio!": "The desk is full!",
+            "Archivero Lleno": "Filing Cabinet Full",
+            "Los pendientes llegaron hasta el techo.": "The pending tasks hit the ceiling.",
+            "🎉 ¡Nuevo Récord en Archivero Tetris!": "🎉 New Record in Filing Tetris!",
+            "Tabla Archivero Tetris": "Filing Tetris Table",
+            "Top 5 partidas": "Top 5 games",
+            "Girar": "Rotate",
+            "Bajar": "Down",
+            "Comparte tu Récord": "Share Your Record",
+            "Tu nombre o apodo en la tarjeta": "Your name or nickname on the card",
+            "Compartir": "Share",
+            "Descargar PNG": "Download PNG",
+            "📅 Próximo episodio: Viernes 05:00": "📅 Next episode: Friday 05:00",
+            "Escúchanos todos los viernes a las 05:00 en Spotify y YouTube.": "Listen to us every Friday at 05:00 on Spotify and YouTube.",
+            "Horario oficial": "Official schedule",
+            "🔥 ¡Ya salió el nuevo episodio de hoy!": "🔥 The new episode is out today!",
+            "Disponible desde las 05:00 en Spotify y YouTube. ¡Corre a escucharlo!": "Available from 05:00 on Spotify and YouTube. Go listen now!",
+            "Viernes 05:00": "Friday 05:00",
+            "⏰ ¡Mañana hay episodio nuevo!": "⏰ New episode tomorrow!",
+            "Prepárate para este viernes a las 05:00 en Spotify y YouTube.": "Get ready for this Friday at 05:00 on Spotify and YouTube.",
+            "Mañana 05:00": "Tomorrow 05:00",
+            "Son las 05:00 del viernes: ya puedes escuchar el nuevo capítulo en Spotify y YouTube.": "It's 05:00 on Friday: you can already listen to the new episode on Spotify and YouTube.",
+            "🎙️ ¡Nuevo episodio disponible en Spotify y YouTube!": "🎙️ New episode available on Spotify and YouTube!",
+            "El podcast de terror laboral y dramas en la industria. ¡Escúchalo y cuéntanos tu historia!": "The workplace horror and industry drama podcast. Listen and tell us your story!",
+            "Enlace copiado al portapapeles": "Link copied to clipboard",
+            "📨 Tu historia pendiente se envió al buzón": "📨 Your pending story was sent to the mailbox",
+            "📨 Historias enviadas al buzón": "📨 Stories sent to the mailbox",
+            "Tus historias guardadas sin conexión ya llegaron al programa.": "Your offline-saved stories have reached the show.",
+            "Tienes 1 historia guardada: se enviará sola cuando tengas internet.": "You have 1 story saved: it will send automatically when you have internet.",
+            "Tienes ": "You have ",
+            " historias guardadas: se enviarán solas cuando tengas internet.": " stories saved: they will send automatically when you have internet.",
+            "Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.": "Your story went straight to our official mailbox. Thanks for sharing it with (casi) Desempleados.",
+            "📨 Chismesito enviado al buzón oficial": "📨 Gossip sent to the official mailbox",
+            "📨 Chismesito enviado al buzón": "📨 Gossip sent to the mailbox",
+            "Tu historia quedó registrada de forma segura para el programa.": "Your story was safely recorded for the show.",
+            "¡Guardada sin conexión!": "Saved offline!",
+            "Tu historia se guardó en tu teléfono y se enviará sola al buzón cuando tengas internet. Gracias por compartirla con (casi) Desempleados.": "Your story was saved on your phone and will send to the mailbox on its own when you have internet. Thanks for sharing it with (casi) Desempleados.",
+            "📨 Sin conexión: tu historia se guardó y se enviará sola": "📨 Offline: your story was saved and will send on its own",
+            "Hubo un detalle de red, intenta de nuevo": "There was a network issue, try again",
+            "Te cayó un reporte directo de Recursos Humanos.": "You got a write-up straight from Human Resources.",
+            "Te atraparon en una junta de último minuto a las 5:59 PM.": "You got caught in a last-minute 5:59 PM meeting.",
+            "¡Toca CHECAR justo en la zona verde!": "Tap CLOCK IN right in the green zone!",
+            "¡CHECAR ENTRADA!": "CLOCK IN!",
+            "🌟 ¡09:00 EN PUNTO! +50 PTS": "🌟 09:00 SHARP! +50 PTS",
+            "✅ ¡A tiempo! +25 PTS": "✅ On time! +25 PTS",
+            "🚨 ¡RETARDO! RH tomó nota (-1 vida)": "🚨 LATE! HR took note (-1 life)",
+            "⚠️ ¡Demasiado temprano! (-1 vida)": "⚠️ Too early! (-1 life)",
+            "PUNTAJE FINAL": "FINAL SCORE",
+            "TIEMPO": "TIME",
+            "JUGADOR": "PLAYER",
+            "¿Crees poder superar mi récord?": "Think you can beat my record?",
+            "Entra a la app de (casi) Desempleados y juega": "Open the (casi) Desempleados app and play",
+            "Récord en (casi) Desempleados": "Record in (casi) Desempleados",
+            "Imagen descargada para que la compartas en tus redes": "Image downloaded so you can share it on your socials",
+            "📸 Tarjeta descargada en PNG": "📸 Card downloaded as PNG",
+            "App oficial del programa (casi) Desempleados: episodios, buzón anónimo y minijuegos.": "Official app of the (casi) Desempleados show: episodes, anonymous mailbox and minigames.",
+            "Godín Anónimo": "Anonymous Godín",
+            "🏃 Récord Esquiva el Reporte": "🏃 Dodge the Report Record",
+            "⏱️ Récord Checa Tarjeta": "⏱️ Clock In Record",
+            "📦 Récord Archivero Tetris": "📦 Filing Tetris Record",
+            "Minijuego 1": "Minigame 1",
+            "Minijuego 2": "Minigame 2",
+            "Minijuego 3": "Minigame 3",
+            "ESQUIVA EL REPORTE": "DODGE THE REPORT",
+            "CHECA TARJETA": "CLOCK IN",
+            "ARCHIVERO TETRIS": "FILING TETRIS",
+            "⚡ ¡NIVEL {n}! +VELOCIDAD": "⚡ LEVEL {n}! +SPEED",
+            "Vel.": "Speed",
+            "Enviando al buzón...": "Sending to the mailbox...",
+            "historias pendientes se enviaron al buzón": "pending stories were sent to the mailbox",
+            "Ahora": "Now",
+            "🏆 Hice {s} pts ({d}) en {g} de (casi) Desempleados. ¿Puedes superar mi récord?": "🏆 I scored {s} pts ({d}) in {g} from (casi) Desempleados. Can you beat my record?",
+            "Ej. El Becario Asustado": "E.g. The Scared Intern",
+            "Escribe aquí todo el contexto sin miedo...": "Write all the context here, don't hold back...",
+            "Ej. El Godín Sobreviviente": "E.g. The Survivor Godín"
+};
+        const I18N_ES = {};
+        Object.keys(I18N_EN).forEach(function (k) { I18N_ES[I18N_EN[k]] = k; });
+        let currentLang = 'es';
+        try { currentLang = localStorage.getItem('casi-lang') || 'es'; } catch (e) {}
+        if (currentLang !== 'en' && currentLang !== 'es') currentLang = 'es';
+        function tr(s) {
+            if (currentLang === 'es' || s == null) return s;
+            return I18N_EN[s] !== undefined ? I18N_EN[s] : s;
+        }
+        function swapTextNodes(root) {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode: function (node) {
+                    if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                    const p = node.parentElement;
+                    if (!p) return NodeFilter.FILTER_REJECT;
+                    if (p.closest('script, style, noscript, [data-no-i18n]')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+            const nodes = [];
+            while (walker.nextNode()) nodes.push(walker.currentNode);
+            nodes.forEach(function (node) {
+                const v = node.nodeValue;
+                const t = v.trim();
+                if (currentLang === 'en') {
+                    if (I18N_EN[t] !== undefined) node.nodeValue = v.replace(t, I18N_EN[t]);
+                } else {
+                    if (I18N_ES[t] !== undefined) node.nodeValue = v.replace(t, I18N_ES[t]);
+                }
+            });
+        }
+        function applyLang(lang) {
+            currentLang = (lang === 'en') ? 'en' : 'es';
+            try { localStorage.setItem('casi-lang', currentLang); } catch (e) {}
+            document.documentElement.lang = currentLang;
+            swapTextNodes(document.body);
+            document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+                const key = el.getAttribute('data-i18n-ph');
+                if (currentLang === 'en' && I18N_EN[key] !== undefined) el.setAttribute('placeholder', I18N_EN[key]);
+                else el.setAttribute('placeholder', key);
+            });
+            const langLabel = document.getElementById('lang-label');
+            if (langLabel) langLabel.textContent = (currentLang === 'es') ? 'EN' : 'ES';
+            if (typeof renderNotifications === 'function') renderNotifications();
+            if (typeof updateBuzonPendingBadge === 'function') updateBuzonPendingBadge();
+            try {
+                const speedBadge = document.getElementById('checa-speed-badge');
+                if (speedBadge && typeof checaDay !== 'undefined') {
+                    speedBadge.textContent = tr('Vel.') + ' ' + (1 + (checaDay - 1) * 0.2).toFixed(1) + 'x';
+                }
+            } catch (e) {}
+        }
+        function toggleLang() {
+            const next = (currentLang === 'es') ? 'en' : 'es';
+            applyLang(next);
+            showToast(next === 'en' ? 'Language changed to English' : 'Idioma cambiado a español');
+        }
         // ==========================================
         // 1. NAVEGACIÓN ENTRE PESTAÑAS Y NOTIFICACIONES
         // ==========================================
@@ -977,10 +1213,10 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2">
-                            <h4 class="text-sm font-extrabold text-white leading-snug">${item.title}</h4>
-                            <span class="text-[10px] text-gray-400 shrink-0">${item.time}</span>
+                            <h4 class="text-sm font-extrabold text-white leading-snug">${tr(item.title)}</h4>
+                            <span class="text-[10px] text-gray-400 shrink-0">${tr(item.time)}</span>
                         </div>
-                        <p class="text-xs text-gray-300 mt-0.5 leading-snug">${item.body}</p>
+                        <p class="text-xs text-gray-300 mt-0.5 leading-snug">${tr(item.body)}</p>
                     </div>
                 </div>
             `).join('');
@@ -1108,7 +1344,7 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             if (!toast) return;
-            toast.textContent = msg;
+            toast.textContent = tr(msg);
             toast.classList.remove('opacity-0');
             toast.classList.add('opacity-100');
             clearTimeout(window._toastTimer);
@@ -1215,7 +1451,7 @@
                 }
             } catch (err) {}
             if (sent > 0) {
-                showToast(sent === 1 ? '📨 Tu historia pendiente se envió al buzón' : '📨 ' + sent + ' historias pendientes se enviaron al buzón');
+                showToast(sent === 1 ? '📨 Tu historia pendiente se envió al buzón' : '📨 ' + sent + ' ' + tr('historias pendientes se enviaron al buzón'));
                 pushNotification(
                     '📨 Historias enviadas al buzón',
                     'Tus historias guardadas sin conexión ya llegaron al programa.',
@@ -1233,7 +1469,7 @@
             if (!badge) return;
             if (count > 0) {
                 badge.classList.remove('hidden');
-                badge.textContent = count === 1 ? 'Tienes 1 historia guardada: se enviará sola cuando tengas internet.' : 'Tienes ' + count + ' historias guardadas: se enviarán solas cuando tengas internet.';
+                badge.textContent = count === 1 ? tr('Tienes 1 historia guardada: se enviará sola cuando tengas internet.') : tr('Tienes ') + count + tr(' historias guardadas: se enviarán solas cuando tengas internet.');
             } else {
                 badge.classList.add('hidden');
             }
@@ -1262,7 +1498,7 @@
             const submitBtn = document.getElementById('buzon-submit-btn');
             const originalBtnHtml = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Enviando al buzón...</span>';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>' + tr('Enviando al buzón...') + '</span>';
 
             const formData = new URLSearchParams();
             formData.append('entry.370750559', alias || 'Anónimo');
@@ -1280,8 +1516,8 @@
                     body: formData.toString()
                 });
 
-                document.getElementById('buzon-success-title').textContent = '¡Recibido en cabina!';
-                document.getElementById('buzon-success-text').textContent = 'Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.';
+                document.getElementById('buzon-success-title').textContent = tr('¡Recibido en cabina!');
+                document.getElementById('buzon-success-text').textContent = tr('Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.');
                 document.getElementById('buzon-form').classList.add('hidden');
                 document.getElementById('buzon-success').classList.remove('hidden');
                 showToast('📨 Chismesito enviado al buzón oficial');
@@ -1295,8 +1531,8 @@
                 try {
                     await queueBuzonMessage({ alias: alias || 'Anónimo', privacy: privacyChoice, story: story, createdAt: Date.now() });
                     registerBuzonSync();
-                    document.getElementById('buzon-success-title').textContent = '¡Guardada sin conexión!';
-                    document.getElementById('buzon-success-text').textContent = 'Tu historia se guardó en tu teléfono y se enviará sola al buzón cuando tengas internet. Gracias por compartirla con (casi) Desempleados.';
+                    document.getElementById('buzon-success-title').textContent = tr('¡Guardada sin conexión!');
+                    document.getElementById('buzon-success-text').textContent = tr('Tu historia se guardó en tu teléfono y se enviará sola al buzón cuando tengas internet. Gracias por compartirla con (casi) Desempleados.');
                     document.getElementById('buzon-form').classList.add('hidden');
                     document.getElementById('buzon-success').classList.remove('hidden');
                     showToast('📨 Sin conexión: tu historia se guardó y se enviará sola');
@@ -1312,8 +1548,8 @@
 
         function resetBuzon() {
             document.getElementById('buzon-story').value = '';
-            document.getElementById('buzon-success-title').textContent = '¡Recibido en cabina!';
-            document.getElementById('buzon-success-text').textContent = 'Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.';
+            document.getElementById('buzon-success-title').textContent = tr('¡Recibido en cabina!');
+            document.getElementById('buzon-success-text').textContent = tr('Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.');
             document.getElementById('buzon-success').classList.add('hidden');
             document.getElementById('buzon-form').classList.remove('hidden');
         }
@@ -1669,10 +1905,10 @@
 
                 if (hit) {
                     if (item.kind === 'report') {
-                        triggerGameOver('Te cayó un reporte directo de Recursos Humanos.');
+                        triggerGameOver(tr('Te cayó un reporte directo de Recursos Humanos.'));
                         return;
                     } else if (item.kind === 'meeting') {
-                        triggerGameOver('Te atraparon en una junta de último minuto a las 5:59 PM.');
+                        triggerGameOver(tr('Te atraparon en una junta de último minuto a las 5:59 PM.'));
                         return;
                     } else {
                         score += item.points;
@@ -1685,7 +1921,7 @@
                             currentEsquivaLevel = newLevel;
                             document.getElementById('esquiva-level-display').textContent = currentEsquivaLevel;
                             const lvlBanner = document.getElementById('esquiva-level-banner');
-                            lvlBanner.textContent = `⚡ ¡NIVEL ${currentEsquivaLevel}! +VELOCIDAD`;
+                            lvlBanner.textContent = tr('⚡ ¡NIVEL {n}! +VELOCIDAD').replace('{n}', currentEsquivaLevel);
                             lvlBanner.classList.remove('hidden');
                             clearTimeout(window._lvlBannerTimer);
                             window._lvlBannerTimer = setTimeout(() => {
@@ -1784,7 +2020,7 @@
             perfectEl.style.width = `${perfectWidth}%`;
 
             checaSpeed = 1.1 + (checaDay - 1) * 0.22;
-            document.getElementById('checa-speed-badge').textContent = `Vel. ${(1 + (checaDay - 1) * 0.2).toFixed(1)}x`;
+            document.getElementById('checa-speed-badge').textContent = tr('Vel.') + ' ' + (1 + (checaDay - 1) * 0.2).toFixed(1) + 'x';
             document.getElementById('checa-day-display').textContent = checaDay;
         }
 
@@ -1799,9 +2035,9 @@
 
             document.getElementById('checa-score-display').textContent = '0';
             document.getElementById('checa-lives-display').textContent = '❤️❤️❤️';
-            document.getElementById('checa-feedback-text').textContent = '¡Toca CHECAR justo en la zona verde!';
+            document.getElementById('checa-feedback-text').textContent = tr('¡Toca CHECAR justo en la zona verde!');
             document.getElementById('checa-feedback-text').className = 'text-sm font-extrabold text-brand-yellow mt-1 h-4';
-            document.getElementById('checa-btn-label').textContent = '¡CHECAR ENTRADA!';
+            document.getElementById('checa-btn-label').textContent = tr('¡CHECAR ENTRADA!');
             document.getElementById('checa-gameover-overlay').classList.add('hidden');
             document.getElementById('checa-gameover-overlay').classList.remove('flex');
 
@@ -1859,17 +2095,17 @@
             if (distFromCenter <= perfectHalf) {
                 checaScore += 50;
                 checaDay++;
-                fbEl.textContent = '🌟 ¡09:00 EN PUNTO! +50 PTS';
+                fbEl.textContent = tr('🌟 ¡09:00 EN PUNTO! +50 PTS');
                 fbEl.className = 'text-sm font-black text-brand-yellow mt-1 h-4';
             } else if (checaPos >= checaZoneLeft && checaPos <= zoneEnd) {
                 checaScore += 25;
                 checaDay++;
-                fbEl.textContent = '✅ ¡A tiempo! +25 PTS';
+                fbEl.textContent = tr('✅ ¡A tiempo! +25 PTS');
                 fbEl.className = 'text-sm font-extrabold text-emerald-400 mt-1 h-4';
             } else {
                 checaLives--;
                 document.getElementById('checa-lives-display').textContent = '❤️'.repeat(Math.max(0, checaLives)) || '💔';
-                fbEl.textContent = checaPos > zoneEnd ? '🚨 ¡RETARDO! RH tomó nota (-1 vida)' : '⚠️ ¡Demasiado temprano! (-1 vida)';
+                fbEl.textContent = checaPos > zoneEnd ? tr('🚨 ¡RETARDO! RH tomó nota (-1 vida)') : tr('⚠️ ¡Demasiado temprano! (-1 vida)');
                 fbEl.className = 'text-sm font-extrabold text-rose-400 mt-1 h-4';
 
                 if (checaLives <= 0) {
@@ -2297,7 +2533,7 @@
             gameTitle: 'Esquiva el Reporte',
             score: 0,
             duration: '00:00',
-            playerName: localStorage.getItem('casi_desempleados_player_name') || 'Godín Anónimo'
+            playerName: localStorage.getItem('casi_desempleados_player_name') || tr('Godín Anónimo')
         };
 
         function shareGameScore(gameKey = 'esquiva') {
@@ -2323,7 +2559,7 @@
         }
 
         function updateShareCardName(val) {
-            shareCardData.playerName = val.trim() || 'Godín Anónimo';
+            shareCardData.playerName = val.trim() || tr('Godín Anónimo');
             localStorage.setItem('casi_desempleados_player_name', shareCardData.playerName);
             renderShareCardCanvas();
         }
@@ -2370,11 +2606,11 @@
             sctx.fill();
             sctx.fillStyle = '#fde067';
             sctx.font = '800 22px Montserrat, sans-serif';
-            sctx.fillText(shareCardData.gameTitle.toUpperCase(), 360, 260);
+            sctx.fillText(tr(shareCardData.gameTitle.toUpperCase()), 360, 260);
 
             sctx.fillStyle = '#9CA3AF';
             sctx.font = '700 20px Montserrat, sans-serif';
-            sctx.fillText('JUGADOR', 360, 330);
+            sctx.fillText(tr('JUGADOR'), 360, 330);
 
             sctx.fillStyle = '#FFFFFF';
             sctx.font = '900 38px Montserrat, sans-serif';
@@ -2390,7 +2626,7 @@
 
             sctx.fillStyle = '#9CA3AF';
             sctx.font = '800 20px Montserrat, sans-serif';
-            sctx.fillText('PUNTAJE FINAL', 225, 478);
+            sctx.fillText(tr('PUNTAJE FINAL'), 225, 478);
             sctx.fillStyle = '#fde067';
             sctx.font = '900 68px Montserrat, sans-serif';
             sctx.fillText(String(shareCardData.score), 225, 555);
@@ -2400,7 +2636,7 @@
 
             sctx.fillStyle = '#9CA3AF';
             sctx.font = '800 20px Montserrat, sans-serif';
-            sctx.fillText('TIEMPO', 495, 478);
+            sctx.fillText(tr('TIEMPO'), 495, 478);
             sctx.fillStyle = '#5CE1E6';
             sctx.font = '900 56px Montserrat, sans-serif';
             sctx.fillText(String(shareCardData.duration), 495, 555);
@@ -2414,7 +2650,7 @@
             sctx.fill();
 
             sctx.fillStyle = '#111111';
-            const postitLine1 = '¿Crees poder superar mi récord?';
+            const postitLine1 = tr('¿Crees poder superar mi récord?');
             let postitSize1 = 38;
             sctx.font = `700 ${postitSize1}px Caveat, cursive`;
             while (sctx.measureText(postitLine1).width > 580 - 36 && postitSize1 > 20) {
@@ -2422,7 +2658,7 @@
                 sctx.font = `700 ${postitSize1}px Caveat, cursive`;
             }
             sctx.fillText(postitLine1, 290, 44);
-            const postitLine2 = 'Entra a la app de (casi) Desempleados y juega';
+            const postitLine2 = tr('Entra a la app de (casi) Desempleados y juega');
             let postitSize2 = 21;
             sctx.font = `800 ${postitSize2}px Montserrat, sans-serif`;
             while (sctx.measureText(postitLine2).width > 580 - 36 && postitSize2 > 12) {
@@ -2437,7 +2673,7 @@
             const sc = document.getElementById('shareCardCanvas');
             if (!sc) return;
 
-            const shareText = `🏆 Hice ${shareCardData.score} pts (${shareCardData.duration}) en ${shareCardData.gameTitle} de (casi) Desempleados. ¿Puedes superar mi récord?`;
+            const shareText = tr('🏆 Hice {s} pts ({d}) en {g} de (casi) Desempleados. ¿Puedes superar mi récord?').replace('{s}', shareCardData.score).replace('{d}', shareCardData.duration).replace('{g}', tr(shareCardData.gameTitle));
 
             try {
                 const blob = await new Promise(resolve => sc.toBlob(resolve, 'image/png'));
@@ -2445,7 +2681,7 @@
 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
-                        title: 'Récord en (casi) Desempleados',
+                        title: tr('Récord en (casi) Desempleados'),
                         text: shareText,
                         files: [file]
                     });
@@ -2478,7 +2714,7 @@
                 const manifestObj = {
                     name: '(casi) Desempleados',
                     short_name: '(casi)',
-                    description: 'App oficial del programa (casi) Desempleados: episodios, buzón anónimo y minijuegos.',
+                    description: tr('App oficial del programa (casi) Desempleados: episodios, buzón anónimo y minijuegos.'),
                     start_url: '.',
                     display: 'standalone',
                     background_color: '#100E17',
@@ -2506,6 +2742,7 @@
             initNotifications();
             resizeGameCanvas();
         });
+        applyLang(currentLang);
     </script>
 </body>
 </html>
