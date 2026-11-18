@@ -370,10 +370,12 @@
                         </button>
                     </form>
 
+                    <p id="buzon-pending" class="hidden text-[11px] font-bold text-brand-yellow bg-brand-yellow/10 border border-brand-yellow/30 rounded-xl px-3 py-2"></p>
+
                     <div id="buzon-success" class="hidden space-y-3 pt-1">
                         <div class="post-it p-4 rounded-2xl text-gray-900">
-                            <div class="font-handwriting text-2xl font-bold leading-none mb-1">¡Recibido en cabina!</div>
-                            <p class="text-xs font-bold text-gray-800">
+                            <div id="buzon-success-title" class="font-handwriting text-2xl font-bold leading-none mb-1">¡Recibido en cabina!</div>
+                            <p id="buzon-success-text" class="text-xs font-bold text-gray-800">
                                 Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.
                             </p>
                         </div>
@@ -1121,6 +1123,129 @@
         // ==========================================
         const GOOGLE_FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdJfJ6zFq1rqkDVODo2Se8uhXiMT2bGeLcEkhU7Xt9pDcX-OQ/formResponse';
 
+        // ==========================================
+        // 2b. SERVICE WORKER: MODO SIN CONEXIÓN
+        // ==========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+
+        // ==========================================
+        // 2c. BUZÓN SIN CONEXIÓN (ENVÍO DIFERIDO)
+        // La historia se guarda en el teléfono y se envía sola
+        // cuando vuelve la red (Background Sync en Android,
+        // al abrir la app con internet en iPhone y demás).
+        // ==========================================
+        function openBuzonDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open('casi-desempleados', 1);
+                request.onupgradeneeded = () => {
+                    if (!request.result.objectStoreNames.contains('buzon-outbox')) {
+                        request.result.createObjectStore('buzon-outbox', { keyPath: 'id', autoIncrement: true });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function queueBuzonMessage(data) {
+            return openBuzonDB().then((db) => new Promise((resolve, reject) => {
+                const tx = db.transaction('buzon-outbox', 'readwrite');
+                const req = tx.objectStore('buzon-outbox').add(data);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            }));
+        }
+
+        function countBuzonOutbox() {
+            return openBuzonDB().then((db) => new Promise((resolve, reject) => {
+                const tx = db.transaction('buzon-outbox', 'readonly');
+                const req = tx.objectStore('buzon-outbox').count();
+                req.onsuccess = () => resolve(req.result || 0);
+                req.onerror = () => reject(req.error);
+            })).catch(() => 0);
+        }
+
+        function registerBuzonSync() {
+            if ('serviceWorker' in navigator && 'SyncManager' in window) {
+                navigator.serviceWorker.ready.then((reg) => reg.sync.register('enviar-buzon')).catch(() => {});
+            }
+        }
+
+        function postBuzonToForm(item) {
+            const formData = new URLSearchParams();
+            formData.append('entry.370750559', item.alias || 'Anónimo');
+            formData.append('entry.116396303', item.privacy);
+            formData.append('entry.1234219413', item.story);
+            return fetch(GOOGLE_FORM_ACTION_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+        }
+
+        async function flushBuzonOutbox() {
+            if (!navigator.onLine) return 0;
+            let sent = 0;
+            try {
+                const db = await openBuzonDB();
+                const items = await new Promise((resolve, reject) => {
+                    const tx = db.transaction('buzon-outbox', 'readonly');
+                    const req = tx.objectStore('buzon-outbox').getAll();
+                    req.onsuccess = () => resolve(req.result || []);
+                    req.onerror = () => reject(req.error);
+                });
+                for (const item of items) {
+                    await postBuzonToForm(item);
+                    await new Promise((resolve, reject) => {
+                        const tx = db.transaction('buzon-outbox', 'readwrite');
+                        const req = tx.objectStore('buzon-outbox').delete(item.id);
+                        req.onsuccess = () => resolve();
+                        req.onerror = () => reject(req.error);
+                    });
+                    sent++;
+                }
+            } catch (err) {}
+            if (sent > 0) {
+                showToast(sent === 1 ? '📨 Tu historia pendiente se envió al buzón' : '📨 ' + sent + ' historias pendientes se enviaron al buzón');
+                pushNotification(
+                    '📨 Historias enviadas al buzón',
+                    'Tus historias guardadas sin conexión ya llegaron al programa.',
+                    'fa-envelope-open-text',
+                    'bg-brand-yellow text-gray-900'
+                );
+            }
+            updateBuzonPendingBadge();
+            return sent;
+        }
+
+        async function updateBuzonPendingBadge() {
+            const count = await countBuzonOutbox();
+            const badge = document.getElementById('buzon-pending');
+            if (!badge) return;
+            if (count > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = count === 1 ? 'Tienes 1 historia guardada: se enviará sola cuando tengas internet.' : 'Tienes ' + count + ' historias guardadas: se enviarán solas cuando tengas internet.';
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        window.addEventListener('online', () => { flushBuzonOutbox(); });
+        window.addEventListener('load', () => { flushBuzonOutbox(); updateBuzonPendingBadge(); });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'buzon-outbox-flushed' && event.data.count > 0) {
+                    showToast(event.data.count === 1 ? '📨 Tu historia pendiente se envió al buzón' : '📨 ' + event.data.count + ' historias pendientes se enviaron al buzón');
+                    updateBuzonPendingBadge();
+                }
+            });
+        }
+
         async function submitAnonMessage(e) {
             e.preventDefault();
             const alias = document.getElementById('buzon-alias').value.trim();
@@ -1141,6 +1266,7 @@
             formData.append('entry.1234219413', story);
 
             try {
+                if (!navigator.onLine) throw new Error('offline');
                 await fetch(GOOGLE_FORM_ACTION_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -1150,6 +1276,8 @@
                     body: formData.toString()
                 });
 
+                document.getElementById('buzon-success-title').textContent = '¡Recibido en cabina!';
+                document.getElementById('buzon-success-text').textContent = 'Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.';
                 document.getElementById('buzon-form').classList.add('hidden');
                 document.getElementById('buzon-success').classList.remove('hidden');
                 showToast('📨 Chismesito enviado al buzón oficial');
@@ -1160,7 +1288,18 @@
                     'bg-brand-yellow text-gray-900'
                 );
             } catch (error) {
-                showToast('Hubo un detalle de red, intenta de nuevo');
+                try {
+                    await queueBuzonMessage({ alias: alias || 'Anónimo', privacy: privacyChoice, story: story, createdAt: Date.now() });
+                    registerBuzonSync();
+                    document.getElementById('buzon-success-title').textContent = '¡Guardada sin conexión!';
+                    document.getElementById('buzon-success-text').textContent = 'Tu historia se guardó en tu teléfono y se enviará sola al buzón cuando tengas internet. Gracias por compartirla con (casi) Desempleados.';
+                    document.getElementById('buzon-form').classList.add('hidden');
+                    document.getElementById('buzon-success').classList.remove('hidden');
+                    showToast('📨 Sin conexión: tu historia se guardó y se enviará sola');
+                    updateBuzonPendingBadge();
+                } catch (queueError) {
+                    showToast('Hubo un detalle de red, intenta de nuevo');
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnHtml;
@@ -1169,6 +1308,8 @@
 
         function resetBuzon() {
             document.getElementById('buzon-story').value = '';
+            document.getElementById('buzon-success-title').textContent = '¡Recibido en cabina!';
+            document.getElementById('buzon-success-text').textContent = 'Tu historia ya cayó directo en nuestro buzón oficial. Gracias por compartirla con (casi) Desempleados.';
             document.getElementById('buzon-success').classList.add('hidden');
             document.getElementById('buzon-form').classList.remove('hidden');
         }
