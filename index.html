@@ -863,6 +863,103 @@
             </div>
         </div>
 
+
+        <!-- ========================================== -->
+        <!-- MODAL: CÓMO INSTALAR LA APP                -->
+        <!-- ========================================== -->
+        <div id="install-modal" class="hidden absolute inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+            <div class="bg-brand-card border border-white/15 rounded-2xl p-4 w-full max-w-[360px] space-y-3 shadow-2xl max-h-[90%] overflow-y-auto no-scrollbar">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-black text-white flex items-center gap-1.5">
+                        <i class="fas fa-mobile-screen text-brand-yellow"></i> Instala la app
+                    </h3>
+                    <button onclick="closeInstallModal()" class="text-gray-400 hover:text-white p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <p class="text-sm text-gray-300 leading-snug">Llévala en tu pantalla de inicio y entra directo a los episodios, el buzón y los juegos.</p>
+
+                <!-- Ilustración: pantalla de inicio con el icono de la app -->
+                <div class="flex justify-center">
+                    <div class="relative w-[132px] h-[220px] rounded-[24px] border-[3px] border-white/25 bg-black shadow-xl overflow-hidden shrink-0">
+                        <div class="flex items-center justify-between px-3 pt-1.5">
+                            <span class="text-[9px] font-bold text-white">9:41</span>
+                            <span class="flex items-center gap-1 text-[8px] text-white"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 px-3 pt-3">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-sky-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-rose-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-violet-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-amber-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-teal-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-orange-500/80"></div>
+                            <div class="w-6 h-6 rounded-lg bg-pink-500/80"></div>
+                        </div>
+                        <div class="absolute bottom-3 left-0 right-0 flex flex-col items-center px-2">
+                            <img id="install-phone-icon" src="" alt="" class="w-12 h-12 rounded-[12px] shadow-lg ring-2 ring-brand-yellow animate-pulse">
+                            <span class="text-[9px] font-bold text-white mt-1 text-center">(casi) Desempleados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="install-now-btn" onclick="promptInstallNow()" class="hidden w-full py-2.5 px-3 rounded-xl bg-brand-yellow hover:bg-brand-yellowHover text-gray-900 font-black text-sm shadow-md transition active:scale-95">
+                    <i class="fas fa-download"></i> Instalar ahora
+                </button>
+
+                <!-- Pasos iPhone -->
+                <div id="install-steps-ios" class="space-y-2">
+                    <h4 class="text-sm font-extrabold text-white flex items-center gap-1.5"><i class="fab fa-apple text-brand-yellow"></i> En iPhone (Safari)</h4>
+                    <div class="rounded-xl bg-black/50 border border-white/10 p-2.5 flex items-center justify-center gap-5">
+                        <i class="fas fa-chevron-left text-gray-500 text-sm"></i>
+                        <span class="relative flex items-center justify-center w-9 h-9 rounded-full bg-brand-yellow/20">
+                            <i class="fas fa-arrow-up-from-bracket text-brand-yellow text-base"></i>
+                            <span class="absolute inset-0 rounded-full ring-2 ring-brand-yellow animate-pulse"></span>
+                        </span>
+                        <i class="fas fa-book-open text-gray-500 text-sm"></i>
+                        <i class="far fa-square text-gray-500 text-sm"></i>
+                    </div>
+                    <ol class="space-y-1.5 text-sm text-gray-200 leading-snug">
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">1</span> Toca el botón Compartir de Safari, el cuadrito con la flecha hacia arriba.</li>
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">2</span> Elige 'Añadir a pantalla de inicio'.</li>
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">3</span> Toca 'Añadir' arriba a la derecha. ¡Listo!</li>
+                    </ol>
+                </div>
+
+                <!-- Pasos Android -->
+                <div id="install-steps-android" class="space-y-2">
+                    <h4 class="text-sm font-extrabold text-white flex items-center gap-1.5"><i class="fab fa-android text-brand-yellow"></i> En Android (Chrome)</h4>
+                    <div class="rounded-xl bg-black/50 border border-white/10 p-2.5">
+                        <div class="flex items-center justify-between px-1">
+                            <span class="text-xs font-bold text-gray-300">Chrome</span>
+                            <span class="relative flex items-center justify-center w-8 h-8 rounded-full bg-brand-yellow/20">
+                                <i class="fas fa-ellipsis-vertical text-brand-yellow text-base"></i>
+                                <span class="absolute inset-0 rounded-full ring-2 ring-brand-yellow animate-pulse"></span>
+                            </span>
+                        </div>
+                        <div class="mt-1.5 mx-1 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-download text-brand-yellow"></i> Instalar app
+                        </div>
+                    </div>
+                    <ol class="space-y-1.5 text-sm text-gray-200 leading-snug">
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">1</span> Toca el menú ⋮ de Chrome, arriba a la derecha.</li>
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">2</span> Toca 'Instalar app'.</li>
+                        <li class="flex gap-2"><span class="shrink-0 w-5 h-5 rounded-full bg-brand-yellow text-gray-900 text-xs font-black flex items-center justify-center">3</span> Confirma con 'Instalar'. ¡Listo!</li>
+                    </ol>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="dismissInstallAsInstalled()" class="py-2.5 px-3 rounded-xl bg-brand-teal hover:bg-brand-tealLight text-white font-extrabold text-sm shadow-md transition active:scale-95">
+                        <i class="fas fa-check"></i> Ya la instalé
+                    </button>
+                    <button onclick="dismissInstallForNow()" class="py-2.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-extrabold text-sm shadow-md transition active:scale-95">
+                        Ahora no
+                    </button>
+                </div>
+            </div>
+        </div>
+
 <!-- Toast de Mensajes -->
         <div id="toast" class="pointer-events-none opacity-0 transition-opacity duration-300 fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900/95 text-white border border-brand-yellow/60 px-4 py-2 rounded-full text-sm font-extrabold shadow-xl z-50 whitespace-nowrap">
         </div>
@@ -1043,7 +1140,24 @@
             "🏆 Hice {s} pts ({d}) en {g} de (casi) Desempleados. ¿Puedes superar mi récord?": "🏆 I scored {s} pts ({d}) in {g} from (casi) Desempleados. Can you beat my record?",
             "Ej. El Becario Asustado": "E.g. The Scared Intern",
             "Escribe aquí todo el contexto sin miedo...": "Write all the context here, don't hold back...",
-            "Ej. El Godín Sobreviviente": "E.g. The Survivor Godín"
+            "Ej. El Godín Sobreviviente": "E.g. The Survivor Godín",
+            "📲 Instala la app en tu teléfono": "📲 Install the app on your phone",
+            "Llévala en tu pantalla de inicio: episodios, buzón y juegos en un toque. Toca aquí para ver cómo instalarla.": "Keep it on your home screen: episodes, mailbox and games in one tap. Tap here to see how to install it.",
+            "Instala la app": "Install the app",
+            "Llévala en tu pantalla de inicio y entra directo a los episodios, el buzón y los juegos.": "Keep it on your home screen and jump straight to the episodes, the mailbox and the games.",
+            "En iPhone (Safari)": "On iPhone (Safari)",
+            "En Android (Chrome)": "On Android (Chrome)",
+            "Toca el botón Compartir de Safari, el cuadrito con la flecha hacia arriba.": "Tap the Share button in Safari (the square with the arrow pointing up).",
+            "Elige 'Añadir a pantalla de inicio'.": "Choose 'Add to Home Screen'.",
+            "Toca 'Añadir' arriba a la derecha. ¡Listo!": "Tap 'Add' at the top right. Done!",
+            "Toca el menú ⋮ de Chrome, arriba a la derecha.": "Tap the Chrome menu ⋮ at the top right.",
+            "Toca 'Instalar app'.": "Tap 'Install app'.",
+            "Confirma con 'Instalar'. ¡Listo!": "Confirm with 'Install'. Done!",
+            "Instalar app": "Install app",
+            "Instalar ahora": "Install now",
+            "Ya la instalé": "Already installed it",
+            "Ahora no": "Not now",
+            "¡Listo! Ya tienes la app instalada.": "Done! You already have the app installed.",
 };
         const I18N_ES = {};
         Object.keys(I18N_EN).forEach(function (k) { I18N_ES[I18N_EN[k]] = k; });
@@ -1207,7 +1321,7 @@
             if (!listEl) return;
 
             listEl.innerHTML = appNotifications.map(item => `
-                <div class="p-3.5 hover:bg-white/5 transition flex items-start gap-3">
+                <div class="p-3.5 hover:bg-white/5 transition flex items-start gap-3${item.action === 'install' ? ' cursor-pointer' : ''}"${item.action === 'install' ? ' onclick="openInstallModal()' : ''}>
                     <div class="w-8 h-8 rounded-xl ${item.color} flex items-center justify-center text-sm shrink-0 mt-0.5 shadow">
                         <i class="fas ${item.icon}"></i>
                     </div>
@@ -1218,9 +1332,115 @@
                         </div>
                         <p class="text-xs text-gray-300 mt-0.5 leading-snug">${tr(item.body)}</p>
                     </div>
+                    ${item.action === 'install' ? '<i class="fas fa-chevron-right text-brand-yellow text-xs mt-1 shrink-0"></i>' : ''}
                 </div>
             `).join('');
         }
+
+
+        /* ==========================================
+           INSTALAR LA APP (PWA)
+           La notificación solo aparece si la app NO está
+           instalada: en modo instalado no se muestra, y
+           al instalarla o descartarla queda guardado.
+           ========================================== */
+        let deferredInstallPrompt = null;
+        function isAppStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: fullscreen)').matches
+                || navigator.standalone === true;
+        }
+        function getInstallPlatform() {
+            const ua = navigator.userAgent || '';
+            const isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isAndroid = /android/i.test(ua);
+            if (isIOS) return 'ios';
+            if (isAndroid) return 'android';
+            return 'both';
+        }
+        function maybeShowInstallNotification() {
+            try {
+                if (isAppStandalone()) return;
+                if (localStorage.getItem('casi-app-installed') === '1') return;
+                if (localStorage.getItem('casi-install-dismissed') === '1') return;
+            } catch (e) { return; }
+            if (appNotifications.some(function (n) { return n.action === 'install'; })) return;
+            appNotifications.unshift({
+                title: '📲 Instala la app en tu teléfono',
+                body: 'Llévala en tu pantalla de inicio: episodios, buzón y juegos en un toque. Toca aquí para ver cómo instalarla.',
+                icon: 'fa-mobile-screen',
+                color: 'bg-brand-yellow text-gray-900',
+                time: 'Ahora',
+                action: 'install'
+            });
+            const badge = document.getElementById('notif-badge');
+            if (badge) badge.classList.remove('hidden');
+            renderNotifications();
+        }
+        function removeInstallNotification() {
+            appNotifications = appNotifications.filter(function (n) { return n.action !== 'install'; });
+            renderNotifications();
+        }
+        function markAppInstalled() {
+            try { localStorage.setItem('casi-app-installed', '1'); } catch (e) {}
+            removeInstallNotification();
+        }
+        function updateInstallNowBtn() {
+            const btn = document.getElementById('install-now-btn');
+            if (!btn) return;
+            if (deferredInstallPrompt && !isAppStandalone()) btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
+        }
+        function openInstallModal() {
+            closeNotificationsPanel();
+            const platform = getInstallPlatform();
+            const ios = document.getElementById('install-steps-ios');
+            const android = document.getElementById('install-steps-android');
+            if (ios) ios.classList.toggle('hidden', platform === 'android');
+            if (android) android.classList.toggle('hidden', platform === 'ios');
+            const iconEl = document.getElementById('install-phone-icon');
+            const appleIcon = document.getElementById('pwa-apple-icon');
+            if (iconEl && appleIcon && appleIcon.href) iconEl.src = appleIcon.href;
+            updateInstallNowBtn();
+            document.getElementById('install-modal').classList.remove('hidden');
+        }
+        function closeInstallModal() {
+            document.getElementById('install-modal').classList.add('hidden');
+        }
+        function dismissInstallAsInstalled() {
+            markAppInstalled();
+            closeInstallModal();
+            showToast('¡Listo! Ya tienes la app instalada.');
+        }
+        function dismissInstallForNow() {
+            try { localStorage.setItem('casi-install-dismissed', '1'); } catch (e) {}
+            removeInstallNotification();
+            closeInstallModal();
+        }
+        async function promptInstallNow() {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            try {
+                const choice = await deferredInstallPrompt.userChoice;
+                if (choice && choice.outcome === 'accepted') {
+                    markAppInstalled();
+                    closeInstallModal();
+                    showToast('¡Listo! Ya tienes la app instalada.');
+                }
+            } catch (e) {}
+            deferredInstallPrompt = null;
+            updateInstallNowBtn();
+        }
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            updateInstallNowBtn();
+        });
+        window.addEventListener('appinstalled', function () {
+            deferredInstallPrompt = null;
+            markAppInstalled();
+            updateInstallNowBtn();
+        });
 
         async function shareApp() {
             const appUrl = 'https://casidesempleados.vercel.app';
@@ -2740,6 +2960,10 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupPWAMetadata();
             initNotifications();
+            if (isAppStandalone()) {
+                try { localStorage.setItem('casi-app-installed', '1'); } catch (e) {}
+            }
+            maybeShowInstallNotification();
             resizeGameCanvas();
         });
         applyLang(currentLang);
