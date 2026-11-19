@@ -1158,6 +1158,7 @@
             "Ya la instalé": "Already installed it",
             "Ahora no": "Not now",
             "¡Listo! Ya tienes la app instalada.": "Done! You already have the app installed.",
+            "Notificación eliminada. Volverá cuando rompas tu récord.": "Notification dismissed. It will return when you break your record.",
 };
         const I18N_ES = {};
         Object.keys(I18N_EN).forEach(function (k) { I18N_ES[I18N_EN[k]] = k; });
@@ -1260,30 +1261,17 @@
                 };
             }
 
+            const dismissedRecords = getDismissedRecords();
+            function recordNotif(game, title, body, icon, color, time, score) {
+                if (dismissedRecords[game] !== undefined && score <= dismissedRecords[game]) return null;
+                return { title: title, body: body, icon: icon, color: color, time: time, record: game, score: score };
+            }
             appNotifications = [
                 episodeNotif,
-                {
-                    title: '🏃 Récord Esquiva el Reporte',
-                    body: `Tu mejor marca es de ${highScore} pts. ¡Evita a Recursos Humanos!`,
-                    icon: 'fa-person-running',
-                    color: 'bg-brand-purple text-brand-yellow',
-                    time: 'Minijuego 1'
-                },
-                {
-                    title: '⏱️ Récord Checa Tarjeta',
-                    body: `Tu mejor marca es de ${checaHighScore} pts. ¡Llega puntual a las 09:00!`,
-                    icon: 'fa-stopwatch',
-                    color: 'bg-brand-teal text-white',
-                    time: 'Minijuego 2'
-                },
-                {
-                    title: '📦 Récord Archivero Tetris',
-                    body: `Tu mejor marca es de ${tetrisHighScore} pts. ¡Que no se llene el escritorio!`,
-                    icon: 'fa-cubes-stacked',
-                    color: 'bg-brand-yellow text-gray-900',
-                    time: 'Minijuego 3'
-                }
-            ];
+                recordNotif('esquiva', '🏃 Récord Esquiva el Reporte', `Tu mejor marca es de ${highScore} pts. ¡Evita a Recursos Humanos!`, 'fa-person-running', 'bg-brand-purple text-brand-yellow', 'Minijuego 1', highScore),
+                recordNotif('checa', '⏱️ Récord Checa Tarjeta', `Tu mejor marca es de ${checaHighScore} pts. ¡Llega puntual a las 09:00!`, 'fa-stopwatch', 'bg-brand-teal text-white', 'Minijuego 2', checaHighScore),
+                recordNotif('tetris', '📦 Récord Archivero Tetris', `Tu mejor marca es de ${tetrisHighScore} pts. ¡Que no se llene el escritorio!`, 'fa-cubes-stacked', 'bg-brand-yellow text-gray-900', 'Minijuego 3', tetrisHighScore)
+            ].filter(function (n) { return n !== null; });
             renderNotifications();
         }
 
@@ -1303,14 +1291,14 @@
             }
         }, 60000);
 
-        function pushNotification(title, body, icon = 'fa-bell', color = 'bg-brand-yellow text-gray-900') {
-            appNotifications.unshift({
+        function pushNotification(title, body, icon = 'fa-bell', color = 'bg-brand-yellow text-gray-900', extra) {
+            appNotifications.unshift(Object.assign({
                 title,
                 body,
                 icon,
                 color,
                 time: 'Ahora'
-            });
+            }, extra || {}));
             const badge = document.getElementById('notif-badge');
             if (badge) badge.classList.remove('hidden');
             renderNotifications();
@@ -1332,9 +1320,28 @@
                         </div>
                         <p class="text-xs text-gray-300 mt-0.5 leading-snug">${tr(item.body)}</p>
                     </div>
-                    ${item.action === 'install' ? '<i class="fas fa-chevron-right text-brand-yellow text-xs mt-1 shrink-0"></i>' : ''}
+                    ${item.action === 'install' ? '<i class="fas fa-chevron-right text-brand-yellow text-xs mt-1 shrink-0"></i>' : ''}${item.record ? '<button type="button" data-dismiss-record="' + item.record + '" data-dismiss-score="' + item.score + '" class="shrink-0 mt-0.5 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-white hover:bg-white/10" aria-label="Eliminar"><i class="fas fa-times text-xs"></i></button>' : ''}
                 </div>
             `).join('');
+            listEl.querySelectorAll('[data-dismiss-record]').forEach(function (btn) {
+                btn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    dismissRecordNotification(btn.getAttribute('data-dismiss-record'), parseInt(btn.getAttribute('data-dismiss-score') || '0', 10));
+                });
+            });
+        }
+
+        /* Récords: se pueden eliminar; vuelven al romperse un récord nuevo. */
+        function getDismissedRecords() {
+            try { return JSON.parse(localStorage.getItem('casi-record-notif-dismissed') || '{}'); } catch (e) { return {}; }
+        }
+        function dismissRecordNotification(game, score) {
+            const dismissed = getDismissedRecords();
+            dismissed[game] = score;
+            localStorage.setItem('casi-record-notif-dismissed', JSON.stringify(dismissed));
+            appNotifications = appNotifications.filter(function (n) { return n.record !== game; });
+            renderNotifications();
+            showToast('Notificación eliminada. Volverá cuando rompas tu récord.');
         }
 
 
@@ -2074,7 +2081,8 @@
                     `🏆 ¡Nuevo récord personal: ${highScore} pts!`,
                     `Sobreviviste ${formattedDuration} esquivando reportes de RH.`,
                     'fa-trophy',
-                    'bg-brand-yellow text-gray-900'
+                    'bg-brand-yellow text-gray-900',
+                    { record: 'esquiva', score: highScore }
                 );
             } else {
                 recordBadge.classList.add('hidden');
@@ -2392,7 +2400,8 @@
                     `⏱️ ¡Récord en Checa Tarjeta: ${checaHighScore} pts!`,
                     `Llegaste hasta el día ${checaDay} sin que RH te levantara acta.`,
                     'fa-stopwatch',
-                    'bg-brand-teal text-white'
+                    'bg-brand-teal text-white',
+                    { record: 'checa', score: checaHighScore }
                 );
             } else {
                 recBadge.classList.add('hidden');
@@ -2729,7 +2738,8 @@
                     `📦 ¡Récord en Archivero Tetris: ${tetrisHighScore} pts!`,
                     `Archivaste ${tetrisLines} líneas antes de que se llenara el escritorio.`,
                     'fa-cubes-stacked',
-                    'bg-brand-yellow text-gray-900'
+                    'bg-brand-yellow text-gray-900',
+                    { record: 'tetris', score: tetrisHighScore }
                 );
             } else {
                 recBadge.classList.add('hidden');
